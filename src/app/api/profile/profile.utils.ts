@@ -110,13 +110,11 @@ export async function createNewUserProfile({
   politicalAffiliation: string;
   locale: string;
 }): Promise<ProfileLocal | string> {
-  // TODO: Validate with real data
   // Step 1: Make sure uid is unique
   const uidAvailable = await isUidAvailable(uid);
   if (!uidAvailable || isUidAvailable === null) {
     return "uid already exists";
   }
-  // TODO: Validate with real data
   // Step 2: Make sure username is unique
   const usernameAvailable = await isUsernameAvailable(username);
   if (!usernameAvailable || usernameAvailable === null) {
@@ -135,7 +133,6 @@ export async function createNewUserProfile({
     totalScore: 0,
     servedArticles: [],
   };
-  // TODO: Add locale
 
   await connectToDatabase();
   const profileResult = await ProfileDb.create(newProfile);
