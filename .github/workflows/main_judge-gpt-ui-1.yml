@@ -9,10 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-with:
-  env:
-    MONGO_DB_CONNECTION_STRING: ${{ secrets.MONGO_DB_CONNECTION_STRING }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -64,3 +60,5 @@ jobs:
           slot-name: "Production"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_548F34720C7648468557FD8572EE8FE1 }}
           package: .
+          env:
+            MONGO_DB_CONNECTION_STRING: ${{ secrets.MONGO_DB_CONNECTION_STRING }}
