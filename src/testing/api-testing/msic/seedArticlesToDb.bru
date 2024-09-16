@@ -1,0 +1,15 @@
+meta {
+  name: seedArticlesToDb
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/misc?seedFunction=articles
+  body: none
+  auth: none
+}
+
+params:query {
+  seedFunction: articles
+}

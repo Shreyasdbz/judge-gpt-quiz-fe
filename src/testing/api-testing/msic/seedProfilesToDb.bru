@@ -1,0 +1,15 @@
+meta {
+  name: seedProfilesToDb
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/misc?seedFunction=profiles
+  body: none
+  auth: none
+}
+
+params:query {
+  seedFunction: profiles
+}

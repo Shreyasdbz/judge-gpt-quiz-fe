@@ -1,0 +1,21 @@
+meta {
+  name: getProfile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/profile?uid=profile_001
+  body: json
+  auth: none
+}
+
+params:query {
+  uid: profile_001
+}
+
+body:json {
+  {
+    "uid": "aklsjd"
+  }
+}

@@ -1,0 +1,26 @@
+meta {
+  name: checkUsername
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/username?username=user7
+  body: none
+  auth: none
+}
+
+params:query {
+  username: user7
+}
+
+headers {
+  Content-Type: application/json
+  User-Agent: Bruno
+}
+
+body:json {
+  {
+    "username": "testMan"
+  }
+}

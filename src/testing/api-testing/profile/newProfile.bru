@@ -1,0 +1,26 @@
+meta {
+  name: newProfile
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/profile?uid=profile_001342
+  body: json
+  auth: none
+}
+
+params:query {
+  uid: profile_001342
+}
+
+body:json {
+  {
+    "username": "user1",
+    "gender": "male",
+    "ageGroup": "From18To24",
+    "educationLevel": "HighSchool",
+    "employmentStatus": "Student",
+    "politicalAffiliation": "Liberal"
+  }
+}

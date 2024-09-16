@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "jgclark.vscode-todo-highlight",
+    "mhutchie.git-graph",
+    "naumovs.color-highlight",
+    "pmneo.tsimporter",
+    "qassimfarid.ejs-language-support",
+    "rvest.vs-code-prettier-eslint",
+    "shd101wyy.markdown-preview-enhanced",
+    "streetsidesoftware.code-spell-checker",
+    "swagatachaudhuri.github-copilot-tools-pack",
+    "yoavbls.pretty-ts-errors"
+  ]
+}
