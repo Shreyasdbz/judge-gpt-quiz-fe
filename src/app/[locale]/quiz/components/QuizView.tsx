@@ -196,7 +196,7 @@ const QuizView = ({
       {/* Article Section */}
       <div className="flex flex-col items-center justify-start w-full h-full">
         {/* Article headline */}
-        <span className="w-full text-left text-2xl font-medium">
+        <span className="w-full text-left text-2xl font-medium pb-1">
           {getLocalizedTitle()}
         </span>
         {/* Article content */}
