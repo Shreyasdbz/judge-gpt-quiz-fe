@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    ignore:
+      # Ignore specific packages or versions
+      - dependency-name: "react"
+        versions: ["17.x"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/" # Actions are usually in the root directory
+    schedule:
+      interval: "weekly" # Adjust based on your preference
