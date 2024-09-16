@@ -191,14 +191,7 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
       const profile = await fetchLocalProfile();
       if (profile != null) {
         setLocalProfile(profile);
-        // Preload the quiz session if the user has a profile
-        const localUid = await fetchProfileUidFromLocalStorage();
-        if (localUid != null) {
-          await createNewQuizSession({
-            newUserUid: localUid,
-            isPreload: true,
-          });
-        }
+        // TODO: Preload the quiz session if the user has a profile
       }
       setIsLoading(false);
     };

@@ -3,6 +3,7 @@
     "title": "JudgeGPT",
     "subtitle": "🔎 Können Sie die Desinformation erkennen? 🕵️‍♂️",
     "description": "Fordern Sie Ihre Fähigkeit heraus, authentische Nachrichten von KI-generierten Fake-News in unserem interaktiven Quiz zu unterscheiden.",
+    "loadingProfile": "Bitte warten, während wir dein Profil laden…",
     "takeTheQuizButton": "Quiz starten",
     "viewTopScoresButton": "Top-Punktzahlen anzeigen",
     "signedInAsText": "Angemeldet als:",

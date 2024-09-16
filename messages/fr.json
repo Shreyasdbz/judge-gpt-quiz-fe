@@ -3,6 +3,7 @@
     "title": "JudgeGPT",
     "subtitle": "🔎 Pouvez-vous repérer la désinformation 🕵️‍♂️",
     "description": "Mettez à l'épreuve votre capacité à distinguer les vraies informations des fausses générées par IA dans notre quiz interactif.",
+    "loadingProfile": "Patientez pendant que nous chargeons votre profil…",
     "takeTheQuizButton": "Passer le quiz",
     "viewTopScoresButton": "Voir les meilleurs scores",
     "signedInAsText": "Connecté en tant que :",

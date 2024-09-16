@@ -3,6 +3,7 @@
     "title": "JudgeGPT",
     "subtitle": "🔎 Can you spot the misinformation 🕵️‍♂️",
     "description": "Challenge your ability to distinguish between authentic news and AI-generated fake news in our interactive quiz.",
+    "loadingProfile": "Hang tight while we load your profile...",
     "takeTheQuizButton": "Take the Quiz",
     "viewTopScoresButton": "View Top Scores",
     "signedInAsText": "Signed in as:",

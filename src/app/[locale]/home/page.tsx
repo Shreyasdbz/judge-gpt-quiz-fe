@@ -10,7 +10,7 @@ import NewQuizTrigger from "./components/NewQuizTrigger";
 import ProfileButton from "./components/ProfileButton";
 
 const HomePage = () => {
-  const { localProfile } = useUserSession();
+  const { localProfile, isLoading } = useUserSession();
   const t = useTranslations("HomePage");
 
   return (
@@ -30,6 +30,11 @@ const HomePage = () => {
           {/* CTA Buttons */}
           <div className="w-full flex flex-col items-center justify-center gap-2">
             {localProfile ? <NewQuizTrigger /> : <ProfileSetupDialog />}
+            {isLoading === true && (
+              <span className="text-sm text-muted-foreground py-1 font-medium">
+                {t("loadingProfile")}
+              </span>
+            )}
             <TopScoresButton />
             {localProfile && <ProfileButton />}
           </div>
