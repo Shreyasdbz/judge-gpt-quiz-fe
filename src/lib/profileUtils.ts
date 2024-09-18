@@ -1,5 +1,4 @@
 import {
-  GenderOptions,
   LOCAL_STORAGE_KEY_PROFILE,
   Profile,
   ProfileLocal,
@@ -13,16 +12,6 @@ import { v4 as uuidv4 } from "uuid";
  */
 export function generateRandomUid(): string {
   return uuidv4();
-}
-
-export function mapGenderOptionsStrings(
-  translationValue: string
-): GenderOptions {
-  console.log(
-    "mapGenderOptionsStrings -> translationValue: ",
-    translationValue
-  );
-  return GenderOptions.Male;
 }
 
 /**

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 async function GET(req: NextRequest) {
-  console.log("GET request to /api/scores: ", req);
+  console.error("GET request to /api/scores: ", req);
 
   // Method not implemented
   return NextResponse.json(

@@ -184,10 +184,12 @@ export async function storeUserResponseOnDb({
     locale_responded_in: localeRespondedIn,
     article_index: articleIndex,
   });
-  console.log("Response stored action result: ", responseResult);
+  if (responseResult == null) {
+    return "Error storing user response";
+  }
 
   // Step 7: Return if user response is correct
-  return userRespondedIsFake === articleResult.isFake;
+  return isFakeResponseBoolean === articleResult.is_fake;
 }
 
 /**
