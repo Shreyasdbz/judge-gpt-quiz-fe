@@ -1,12 +1,7 @@
-import {
-  Article,
-  ArticleLocal,
-  MAX_ARTICLES_PER_SESSION,
-} from "@/models/Article";
+import { ArticleLocal, MAX_ARTICLES_PER_SESSION } from "@/models/Article";
 import ProfileDb from "@/models/ProfileDb";
 import ArticleDb from "@/models/ArticleDb";
 import ResponseDb from "@/models/ResponseDb";
-import { Response } from "@/models/QuizSession";
 import { connectToDatabase } from "@/lib/db";
 
 /**
@@ -20,27 +15,107 @@ import { connectToDatabase } from "@/lib/db";
  * @param userUid
  * @returns
  */
-export async function fetchArticlesForUser(
-  userUid: string
-): Promise<ArticleLocal[] | string> {
+export async function fetchArticlesForUserFromDb({
+  userUid,
+  locale,
+}: {
+  userUid: string;
+  locale: string;
+}): Promise<ArticleLocal[] | string> {
   await connectToDatabase();
 
-  // Step 1: Get user profile from the database
+  // Get user profile from the database
   const userResult = await ProfileDb.findOne({ uid: userUid });
   if (userResult == null) {
     return "User not found";
   }
-  const articlesToExclude: string[] = userResult.servedArticles;
 
-  // Step 2: Fetch articles from the database and exclude the served articles (limit of 5)
-  const articlesResult = await ArticleDb.find({
+  // Article selection logic ~~
+  let articlesToExclude: string[] = [];
+  // Exclude articles that have already been served to the user
+  if (userResult.served_articles != null) {
+    articlesToExclude = userResult.served_articles;
+  }
+  // Limit fetching articles where origin_locale is the user's locale
+  // Fetch articles from the database
+  const fetchedArticles = await ArticleDb.find({
     uid: { $nin: articlesToExclude },
+    origin_locale: { $eq: locale },
   }).limit(MAX_ARTICLES_PER_SESSION);
-  if (articlesResult == null) {
+
+  // If fetched articles are less than the limit, fetch articles from other locales
+  if (fetchedArticles.length < MAX_ARTICLES_PER_SESSION) {
+    const remainingArticlesCount =
+      MAX_ARTICLES_PER_SESSION - fetchedArticles.length;
+    const remainingArticles = await ArticleDb.find({
+      uid: { $nin: articlesToExclude },
+      origin_locale: { $ne: locale },
+    }).limit(remainingArticlesCount);
+    fetchedArticles.push(...remainingArticles);
+  }
+
+  if (fetchedArticles == null) {
     return "No articles found";
   }
 
-  return articlesResult.map(sanitizeArticleToArticleLocal);
+  // If limit still not reached, errror out
+  if (fetchedArticles.length < MAX_ARTICLES_PER_SESSION) {
+    return "Not enough articles found";
+  }
+
+  // For each article where locale, sanitize and return
+  const articlesLocal: ArticleLocal[] = [];
+
+  for (const article of fetchedArticles) {
+    if (article.origin_locale === locale) {
+      articlesLocal.push({
+        uid: article.uid,
+        headline: article.headline,
+        detail: article.detail,
+        content: article.content,
+      });
+    } else {
+      // Map users's locale to each translation
+      if (locale === "en") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_en,
+          detail: article.localized_detail_en,
+          content: article.localized_content_en,
+        });
+      } else if (locale === "es") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_es,
+          detail: article.localized_detail_es,
+          content: article.localized_content_es,
+        });
+      } else if (locale === "fr") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_fr,
+          detail: article.localized_detail_fr,
+          content: article.localized_content_fr,
+        });
+      } else if (locale === "de") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_de,
+          detail: article.localized_detail_de,
+          content: article.localized_content_de,
+        });
+      } else {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.headline,
+          detail: article.detail,
+          content: article.content,
+        });
+      }
+    }
+  }
+
+  return articlesLocal;
 }
 
 /**
@@ -48,18 +123,22 @@ export async function fetchArticlesForUser(
  * @param param0
  * @returns
  */
-export async function storeUserResponse({
+export async function storeUserResponseOnDb({
   userUid,
   articleUid,
   userRespondedIsHuman,
   userRespondedIsFake,
   timeToRespond,
+  localeRespondedIn,
+  articleIndex,
 }: {
   userUid: string;
   articleUid: string;
-  userRespondedIsHuman: boolean;
-  userRespondedIsFake: boolean;
+  userRespondedIsHuman: number;
+  userRespondedIsFake: number;
   timeToRespond: number;
+  localeRespondedIn: string;
+  articleIndex: number;
 }): Promise<boolean | string> {
   await connectToDatabase();
 
@@ -76,10 +155,16 @@ export async function storeUserResponse({
   }
 
   // Step 3: Update the user profile with the served article
-  userResult.servedArticles.push(articleUid);
+  if (userResult.served_articles == null) {
+    userResult.served_articles = [];
+    userResult.served_articles.push(articleUid);
+  } else {
+    userResult.served_articles.push(articleUid);
+  }
   // Step 4: Increment the total score of the user profile if the user response is correct
-  if (userRespondedIsFake === articleResult.isFake) {
-    userResult.totalScore += 1;
+  const isFakeResponseBoolean = userRespondedIsFake === 1 ? true : false;
+  if (isFakeResponseBoolean === articleResult.is_fake) {
+    userResult.total_score += 1;
   }
 
   // Step 5: Save the updated user profile to the database
@@ -88,20 +173,23 @@ export async function storeUserResponse({
     return "Error updating user profile";
   }
 
-  // Step 6: Store in sessions collection
-  const newResponse: Response = {
+  // Step 6: Store in responses collection
+  const responseResult = await ResponseDb.create({
     timestamp: new Date(),
-    userUid: userUid,
-    articleUid: articleUid,
-    userRespondedIsHuman: userRespondedIsHuman,
-    userRespondedIsFake: userRespondedIsFake,
-    timeToRespond: timeToRespond,
-  };
-  const responseResult = await ResponseDb.create(newResponse);
-  console.log("Response stored action result: ", responseResult);
+    user_uid: userUid,
+    article_uid: articleUid,
+    user_responded_is_human: userRespondedIsHuman,
+    user_responded_is_fake: userRespondedIsFake,
+    time_to_respond: timeToRespond,
+    locale_responded_in: localeRespondedIn,
+    article_index: articleIndex,
+  });
+  if (responseResult == null) {
+    return "Error storing user response";
+  }
 
   // Step 7: Return if user response is correct
-  return userRespondedIsFake === articleResult.isFake;
+  return isFakeResponseBoolean === articleResult.is_fake;
 }
 
 /**
@@ -109,19 +197,3 @@ export async function storeUserResponse({
  * Internal functions
  * ////////////////////////////////////////////////
  */
-
-function sanitizeArticleToArticleLocal(article: Article): ArticleLocal {
-  return {
-    uid: article.uid,
-    title: article.title,
-    content: article.content,
-    localizedTitleEn: article.localizedTitleEn,
-    localizedTitleEs: article.localizedTitleEs,
-    localizedTitleFr: article.localizedTitleFr,
-    localizedTitleDe: article.localizedTitleDe,
-    localizedContentEn: article.localizedContentEn,
-    localizedContentEs: article.localizedContentEs,
-    localizedContentFr: article.localizedContentFr,
-    localizedContentDe: article.localizedContentDe,
-  };
-}

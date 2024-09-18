@@ -9,7 +9,7 @@ import {
 import { useParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import { Profile, ProfileLocal } from "@/models/Profile";
-import { QuizSession } from "@/models/QuizSession";
+import { QuizSession } from "@/models/Response";
 import {
   fetchProfileUidFromLocalStorage,
   storeProfileUidInLocalStorage,
@@ -17,7 +17,7 @@ import {
   fetchLocalProfile,
 } from "@/lib/profileUtils";
 import {
-  createQuizSessionFromServer,
+  createQuizSessionOnServer,
   recordUserResponseOnServer,
 } from "@/lib/quizUtils";
 
@@ -66,8 +66,8 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoading(true);
     const result = await createNewProfileOnServer(profileToCreate);
     // Step 2: If the profile is created successfully, set the local profile
-    await storeProfileUidInLocalStorage(profileToCreate.uid);
     if (result != null) {
+      await storeProfileUidInLocalStorage(profileToCreate.uid);
       setLocalProfile(result);
       // Step 3: Create a new quiz session
       await createNewQuizSession({
@@ -89,12 +89,12 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
   }) {
     setIsLoading(true);
     // Make sure quizSession is not already set
-    if (quizSession != null && !forceNewSession) {
+    if (quizSession != null && forceNewSession === false) {
       setIsLoading(false);
       router.push("/quiz");
       return;
     }
-    const localUid = (await fetchProfileUidFromLocalStorage()) || newUserUid;
+    const localUid = newUserUid || (await fetchProfileUidFromLocalStorage());
     // Make sure user profile & localUid is available
     if (localProfile == null || localUid == null) {
       setIsLoading(false);
@@ -102,7 +102,7 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     }
     const userLocale = params.locale as string;
     // Create a new quiz session from the server
-    const quizSessionResult = await createQuizSessionFromServer(
+    const quizSessionResult = await createQuizSessionOnServer(
       localUid,
       userLocale
     );
@@ -143,10 +143,12 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
 
     const answerResult = recordUserResponseOnServer({
       userUid: localUid,
-      articleUid: articleUid,
+      articleUid,
       userRespondedIsHuman: humanOptionSelected,
       userRespondedIsFake: isFakeSelected,
-      timeToRespond: timeToRespond,
+      timeToRespond,
+      localeRespondedIn: params.locale as string,
+      articleIndex: quizSession.currentArticleIndex,
     });
 
     if (answerResult == null) {

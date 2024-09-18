@@ -1,8 +1,15 @@
 import { ArticleLocal } from "@/models/Article";
-import { QuizSession } from "@/models/QuizSession";
+import { QuizSession } from "@/models/Response";
 import axios from "axios";
 
-export async function createQuizSessionFromServer(
+/**
+ * Makes a GET request to the server to create a new quiz session
+ *  and retrieve articles to be served in the quiz.
+ * @param userUid
+ * @param locale
+ * @returns
+ */
+export async function createQuizSessionOnServer(
   userUid: string,
   locale: string
 ): Promise<QuizSession | null> {
@@ -25,26 +32,43 @@ export async function createQuizSessionFromServer(
   return newQuizSession;
 }
 
+/**
+ * Makes a POST request to the server to record the user's response
+ * @param userUid: string
+ * @param articleUid: string
+ * @param userRespondedIsHuman: boolean
+ * @param userRespondedIsFake: boolean
+ * @param timeToRespond: number
+ * @param localeRespondedIn: string
+ * @param articleIndex: number
+ * @returns
+ */
 export async function recordUserResponseOnServer({
   userUid,
   articleUid,
   userRespondedIsHuman,
   userRespondedIsFake,
   timeToRespond,
+  localeRespondedIn,
+  articleIndex,
 }: {
   userUid: string;
   articleUid: string;
   userRespondedIsHuman: boolean;
   userRespondedIsFake: boolean;
   timeToRespond: number;
+  localeRespondedIn: string;
+  articleIndex: number;
 }) {
   const response = await axios.post(
     "/api/quiz",
     {
       articleUid: articleUid,
-      userRespondedIsHuman: userRespondedIsHuman,
-      userRespondedIsFake: userRespondedIsFake,
+      userRespondedIsHuman: userRespondedIsHuman ? 1 : 0,
+      userRespondedIsFake: userRespondedIsFake ? 1 : 0,
       timeToRespond: timeToRespond,
+      localeRespondedIn: localeRespondedIn,
+      articleIndex: articleIndex,
     },
     {
       params: {

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const LOCAL_STORAGE_KEY_PROFILE = "judgegpt_app_profile_uid";
+
 export enum GenderOptions {
   Male = "Male",
   Female = "Female",
@@ -18,6 +20,8 @@ export enum AgeGroupOptions {
 
 export enum EducationLevelOptions {
   HighSchool = "HighSchool",
+  SomeCollege = "SomeCollege",
+  Associates = "Associates",
   Bachelors = "Bachelors",
   Masters = "Masters",
   PhD = "PhD",
@@ -36,24 +40,30 @@ export enum PoliticalAffiliationOptions {
   VeryConservative = "VeryConservative",
   Conservative = "Conservative",
   Moderate = "Moderate",
-  Liberal = "Liberal",
-  VeryLiberal = "VeryLiberal",
+  Progressive = "Progressive",
+  VeryProgressive = "VeryProgressive",
 }
 
 /**
  * Primary profile object
  * @param uid - User ID
+ * @param createdAt - Profile creation datetime
  * @param username - User's public display name
+ * @param gender - User's gender
  * @param ageGroup - User's age group
  * @param educationLevel - User's education level
  * @param employmentStatus - User's employment status
  * @param politicalAffiliation - User's political affiliation
  * @param locale - User's locale
+ * @param userAgent - User's user agent
+ * @param screenResolution - User's screen resolution
+ * @param ipGeoLocation - User's IP-address based geolocation
  * @param totalScore - User's total score
- * @param servedArticlesIds - List of IDs of articles served to the user
+ * @param servedArticles - List of IDs of articles served to the user
  */
 export interface Profile {
   uid: string;
+  createdAt: Date;
   username: string;
   gender: string;
   ageGroup: string;
@@ -61,14 +71,34 @@ export interface Profile {
   employmentStatus: string;
   politicalAffiliation: string;
   locale: string;
+  userAgent: string;
+  screenResolution: string;
+  ipGeoLocation: string;
   totalScore: number;
   servedArticles: string[];
 }
 
 /**
- * Local (on-device) profile object
+ * Local (on-device) profile object to be maintained in state
+ * Only includes:
+ * - uid
+ * - username
+ * - gender
+ * - ageGroup
+ * - educationLevel
+ * - employmentStatus
+ * - politicalAffiliation
+ * - totalScore
  */
-export interface ProfileLocal extends Omit<Profile, "uid" | "servedArticles"> {}
+export interface ProfileLocal
+  extends Omit<
+    Profile,
+    | "createdAt"
+    | "userAgent"
+    | "screenResolution"
+    | "ipGeoLocation"
+    | "servedArticles"
+  > {}
 
 /**
  * Update profile object
@@ -77,8 +107,9 @@ export interface ProfileLocal extends Omit<Profile, "uid" | "servedArticles"> {}
 export interface ProfileUpdateData
   extends Omit<Profile, "uid" | "username" | "totalScore" | "servedArticles"> {}
 
-export const LOCAL_STORAGE_KEY_PROFILE = "judgegpt_app_profile_uid";
-
+/**
+ * Profile form schema for validation
+ */
 export const ProfileFormSchema = z.object({
   username: z
     .string({
@@ -125,5 +156,4 @@ export const ProfileFormSchema = z.object({
     .refine((value) => value === true, {
       message: "Please consent to data collection to continue",
     }),
-  language: z.string(),
 });

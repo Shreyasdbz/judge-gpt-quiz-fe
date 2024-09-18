@@ -225,6 +225,14 @@ const ProfileSetupForm = ({
                 <SelectItem value={EducationLevelOptions.HighSchool}>
                   {translations("newProfileEducationLevelOptionHighSchool")}
                 </SelectItem>
+                <SelectItem value={EducationLevelOptions.SomeCollege}>
+                  {translations("newProfileEducationLevelOptionSomeCollege")}
+                </SelectItem>
+                <SelectItem value={EducationLevelOptions.Associates}>
+                  {translations(
+                    "newProfileEducationLevelOptionAssociateDegree"
+                  )}
+                </SelectItem>
                 <SelectItem value={EducationLevelOptions.Bachelors}>
                   {translations("newProfileEducationLevelOptionBachelorDegree")}
                 </SelectItem>
@@ -321,12 +329,12 @@ const ProfileSetupForm = ({
                     "newProfilePoliticalAffiliationOptionIndependent"
                   )}
                 </SelectItem>
-                <SelectItem value={PoliticalAffiliationOptions.Liberal}>
+                <SelectItem value={PoliticalAffiliationOptions.Progressive}>
                   {translations(
                     "newProfilePoliticalAffiliationOptionProgressive"
                   )}
                 </SelectItem>
-                <SelectItem value={PoliticalAffiliationOptions.VeryLiberal}>
+                <SelectItem value={PoliticalAffiliationOptions.VeryProgressive}>
                   {translations(
                     "newProfilePoliticalAffiliationOptionVeryProgressive"
                   )}

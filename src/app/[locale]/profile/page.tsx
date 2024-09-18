@@ -1,9 +1,7 @@
+import EmptyPageBlock from "@/components/blocks/EmptyPageBlock";
+
 const ProfilePage = () => {
-  return (
-    <div>
-      <h1>Profile Page</h1>
-    </div>
-  );
+  return <EmptyPageBlock pageName="Profile" />;
 };
 
 export default ProfilePage;

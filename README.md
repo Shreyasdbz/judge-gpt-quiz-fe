@@ -86,6 +86,7 @@ Create a `.env.local` file in the root directory and add the following:
 
 ```
 MONGO_DB_CONNECTION_STRING="<your-mongodb-uri>"
+MONGO_DB_DATABASE_NAME="<Pick from which one you're developing with>"
 ```
 
 ### Run the Development Server
@@ -108,5 +109,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 <img width="1662" alt="Screenshot 2024-09-16 at 9 30 02 AM" src="https://github.com/user-attachments/assets/3c924697-cac9-48b4-a5e2-02ad6b28390a">
 <img width="1662" alt="Screenshot 2024-09-16 at 9 30 30 AM" src="https://github.com/user-attachments/assets/ab95ae2e-9840-49c8-aca4-723280dc1f1e">
-
-

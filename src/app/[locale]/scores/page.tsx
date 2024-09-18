@@ -1,9 +1,7 @@
+import EmptyPageBlock from "@/components/blocks/EmptyPageBlock";
+
 const ScoresPage = () => {
-  return (
-    <div>
-      <h1>Scores Page</h1>
-    </div>
-  );
+  return <EmptyPageBlock pageName="Scores" />;
 };
 
 export default ScoresPage;

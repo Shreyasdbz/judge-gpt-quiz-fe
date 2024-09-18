@@ -1,5 +1,4 @@
 import {
-  GenderOptions,
   LOCAL_STORAGE_KEY_PROFILE,
   Profile,
   ProfileLocal,
@@ -13,16 +12,6 @@ import { v4 as uuidv4 } from "uuid";
  */
 export function generateRandomUid(): string {
   return uuidv4();
-}
-
-export function mapGenderOptionsStrings(
-  translationValue: string
-): GenderOptions {
-  console.log(
-    "mapGenderOptionsStrings -> translationValue: ",
-    translationValue
-  );
-  return GenderOptions.Male;
 }
 
 /**
@@ -99,6 +88,7 @@ export async function checkIfUsernameIsAvailable(username: string) {
 }
 
 /**
+ * Makes a POST request to create a new user profile on the server.
  * Creates a new profile on the server.
  * @param profile: Profile
  * @returns ProfileLocal | null
@@ -109,8 +99,25 @@ export async function createNewProfileOnServer(
   try {
     // query param of uid
     const response = await axios.post(
-      `/api/profile?uid=${profile.uid}`,
-      profile
+      `/api/profile`,
+      {
+        createdAt: profile.createdAt,
+        username: profile.username,
+        gender: profile.gender,
+        ageGroup: profile.ageGroup,
+        educationLevel: profile.educationLevel,
+        employmentStatus: profile.employmentStatus,
+        politicalAffiliation: profile.politicalAffiliation,
+        locale: profile.locale,
+        userAgent: profile.userAgent,
+        screenResolution: profile.screenResolution,
+        ipGeoLocation: "NA",
+      },
+      {
+        params: {
+          uid: profile.uid,
+        },
+      }
     );
     if (response.status === 200) {
       const createdLocalProfile = response.data as ProfileLocal;

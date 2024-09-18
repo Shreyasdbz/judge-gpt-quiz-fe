@@ -12,4 +12,6 @@ export interface Response {
   userRespondedIsHuman: boolean;
   userRespondedIsFake: boolean;
   timeToRespond: number;
+  localeRespondedIn: string;
+  articleIndex: number;
 }

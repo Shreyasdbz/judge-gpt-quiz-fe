@@ -1,18 +1,15 @@
 "use client";
 import { useUserSession } from "@/providers/UserSessionProvider";
-// import { useRouter } from "@/i18n/routing";
 import Footer from "@/components/blocks/Footer";
 import SiteLogoText from "@/components/typography/SiteLogoText";
 import QuizSessionContainer from "./components/QuizSessionContainer";
 import { Link } from "@/i18n/routing";
 
 const QuizPage = () => {
-  // const router = useRouter();
   const { isLoading, quizSession } = useUserSession();
 
   if (isLoading === false && quizSession === null) {
     // TODO: Implement a nice error page and redirect button
-    // router.push("/");
     return null;
   }
 
