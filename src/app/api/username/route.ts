@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isUsernameAvailable } from "../profile/profile.utils";
+import { isUsernameAvailableOnDb } from "../profile/profile.utils";
 
 /**
  * [GET] /api/username
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid username" }, { status: 400 });
     }
 
-    const isAvailable = await isUsernameAvailable(username);
+    const isAvailable = await isUsernameAvailableOnDb(username);
 
     // Success
     return NextResponse.json({ available: isAvailable }, { status: 200 });
