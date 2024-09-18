@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchArticlesForUser, storeUserResponse } from "./quiz.utils";
+import {
+  fetchArticlesForUserFromDb,
+  storeUserResponseOnDb,
+} from "./quiz.utils";
 
 /**
  * [GET] /api/quiz
@@ -42,7 +45,7 @@ async function GET(req: NextRequest) {
     }
 
     // Fetch quiz questions for the user from the server
-    const questions = await fetchArticlesForUser(userUid);
+    const questions = await fetchArticlesForUserFromDb(userUid);
     if (!questions) {
       return NextResponse.json(
         { error: "Quiz questions not found" },
@@ -61,15 +64,18 @@ async function GET(req: NextRequest) {
 }
 
 /**
- *
+ * [POST] /api/quiz
+ * Stores the user's response to the quiz question. Returns a message or error.
  * @param req: NextRequest
- * - query: {userUid: string}
+ * - query: { userUid: string }
  * - body: {
  *          articleUid: string,
- *          userRespondedIsHuman: boolean,
- *          userRespondedIsFake: boolean,
- *          timeToRespond: number
- *           }
+ *          userRespondedIsHuman: number,
+ *          userRespondedIsFake: number,
+ *          timeToRespond: number,
+ *          localeRespondedIn: string
+ *          articleIndex: number
+ *         }
  * @returns
  * - status: 200 | 400 | 404 | 500
  * - body: { isCorrect: boolean } | { error: string }
@@ -107,6 +113,8 @@ async function POST(req: NextRequest) {
       userRespondedIsHuman,
       userRespondedIsFake,
       timeToRespond,
+      localeRespondedIn,
+      articleIndex,
     } = await req.json();
     if (!articleUid) {
       return NextResponse.json(
@@ -120,13 +128,13 @@ async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (typeof userRespondedIsHuman !== "boolean") {
+    if (typeof userRespondedIsHuman !== "number") {
       return NextResponse.json(
         { error: "Invalid user response" },
         { status: 400 }
       );
     }
-    if (typeof userRespondedIsFake !== "boolean") {
+    if (typeof userRespondedIsFake !== "number") {
       return NextResponse.json(
         { error: "Invalid user response" },
         { status: 400 }
@@ -138,14 +146,25 @@ async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (typeof localeRespondedIn !== "string") {
+      return NextResponse.json({ error: "Invalid locale" }, { status: 400 });
+    }
+    if (typeof articleIndex !== "number") {
+      return NextResponse.json(
+        { error: "Invalid article index" },
+        { status: 400 }
+      );
+    }
 
     // Store the user's response in the database
-    const isCorrect = await storeUserResponse({
+    const isCorrect = await storeUserResponseOnDb({
       userUid,
       articleUid,
       userRespondedIsHuman,
       userRespondedIsFake,
       timeToRespond,
+      localeRespondedIn,
+      articleIndex,
     });
     if (typeof isCorrect !== "boolean") {
       return NextResponse.json(

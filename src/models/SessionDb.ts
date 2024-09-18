@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export interface Responses extends mongoose.Document {
+export interface Sessions extends mongoose.Document {
   timestamp: Date;
   user_uid: string;
   article_uid: string;
@@ -8,9 +8,10 @@ export interface Responses extends mongoose.Document {
   user_responded_is_fake: number;
   time_to_respond: number;
   locale_responded_in: string;
+  article_index: number;
 }
 
-const ResponseSchema = new mongoose.Schema<Responses>({
+const SessionSchema = new mongoose.Schema<Sessions>({
   timestamp: { type: Date, required: true },
   user_uid: { type: String, required: true },
   article_uid: { type: String, required: true },
@@ -18,7 +19,8 @@ const ResponseSchema = new mongoose.Schema<Responses>({
   user_responded_is_fake: { type: Number, required: true },
   time_to_respond: { type: Number, required: true },
   locale_responded_in: { type: String, required: true },
+  article_index: { type: Number, required: true },
 });
 
-export default mongoose.models.Response ||
-  mongoose.model<Responses>("Response", ResponseSchema);
+export default mongoose.models.Session ||
+  mongoose.model<Sessions>("Session", SessionSchema);

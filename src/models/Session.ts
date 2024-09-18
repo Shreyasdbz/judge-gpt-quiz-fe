@@ -5,7 +5,7 @@ export interface QuizSession {
   currentArticleIndex: number;
 }
 
-export interface Response {
+export interface Session {
   timestamp: Date;
   userUid: string;
   articleUid: string;
@@ -13,4 +13,5 @@ export interface Response {
   userRespondedIsFake: boolean;
   timeToRespond: number;
   localeRespondedIn: string;
+  articleIndex: number;
 }

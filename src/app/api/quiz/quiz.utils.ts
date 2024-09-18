@@ -1,12 +1,7 @@
-import {
-  Article,
-  ArticleLocal,
-  MAX_ARTICLES_PER_SESSION,
-} from "@/models/Article";
+import { ArticleLocal, MAX_ARTICLES_PER_SESSION } from "@/models/Article";
 import ProfileDb from "@/models/ProfileDb";
 import ArticleDb from "@/models/ArticleDb";
 import ResponseDb from "@/models/ResponseDb";
-import { Response } from "@/models/QuizSession";
 import { connectToDatabase } from "@/lib/db";
 
 /**
@@ -20,7 +15,7 @@ import { connectToDatabase } from "@/lib/db";
  * @param userUid
  * @returns
  */
-export async function fetchArticlesForUser(
+export async function fetchArticlesForUserFromDb(
   userUid: string
 ): Promise<ArticleLocal[] | string> {
   await connectToDatabase();
@@ -32,7 +27,12 @@ export async function fetchArticlesForUser(
   }
   const articlesToExclude: string[] = userResult.servedArticles;
 
-  // Step 2: Fetch articles from the database and exclude the served articles (limit of 5)
+  // Step 2: Locale logic
+  // TODO: Implement locale logic
+  // Based on users's local fetch articles that have origin_locale as the user's locale
+  // If less than 5 articles are found, fetch other articles
+
+  // Step 3: Fetch articles from the database and exclude the served articles (limit of 5)
   const articlesResult = await ArticleDb.find({
     uid: { $nin: articlesToExclude },
   }).limit(MAX_ARTICLES_PER_SESSION);
@@ -48,18 +48,22 @@ export async function fetchArticlesForUser(
  * @param param0
  * @returns
  */
-export async function storeUserResponse({
+export async function storeUserResponseOnDb({
   userUid,
   articleUid,
   userRespondedIsHuman,
   userRespondedIsFake,
   timeToRespond,
+  localeRespondedIn,
+  articleIndex,
 }: {
   userUid: string;
   articleUid: string;
-  userRespondedIsHuman: boolean;
-  userRespondedIsFake: boolean;
+  userRespondedIsHuman: number;
+  userRespondedIsFake: number;
   timeToRespond: number;
+  localeRespondedIn: string;
+  articleIndex: number;
 }): Promise<boolean | string> {
   await connectToDatabase();
 
@@ -89,15 +93,16 @@ export async function storeUserResponse({
   }
 
   // Step 6: Store in sessions collection
-  const newResponse: Response = {
+  const responseResult = await ResponseDb.create({
     timestamp: new Date(),
-    userUid: userUid,
-    articleUid: articleUid,
-    userRespondedIsHuman: userRespondedIsHuman,
-    userRespondedIsFake: userRespondedIsFake,
-    timeToRespond: timeToRespond,
-  };
-  const responseResult = await ResponseDb.create(newResponse);
+    user_uid: userUid,
+    article_uid: articleUid,
+    user_responded_is_human: userRespondedIsHuman,
+    user_responded_is_fake: userRespondedIsFake,
+    time_to_respond: timeToRespond,
+    locale_responded_in: localeRespondedIn,
+    article_index: articleIndex,
+  });
   console.log("Response stored action result: ", responseResult);
 
   // Step 7: Return if user response is correct
@@ -110,18 +115,22 @@ export async function storeUserResponse({
  * ////////////////////////////////////////////////
  */
 
-function sanitizeArticleToArticleLocal(article: Article): ArticleLocal {
-  return {
-    uid: article.uid,
-    title: article.title,
-    content: article.content,
-    localizedTitleEn: article.localizedTitleEn,
-    localizedTitleEs: article.localizedTitleEs,
-    localizedTitleFr: article.localizedTitleFr,
-    localizedTitleDe: article.localizedTitleDe,
-    localizedContentEn: article.localizedContentEn,
-    localizedContentEs: article.localizedContentEs,
-    localizedContentFr: article.localizedContentFr,
-    localizedContentDe: article.localizedContentDe,
+function sanitizeArticleToArticleLocal({
+  uid,
+  headline,
+  detail,
+  content,
+}: {
+  uid: string;
+  headline: string;
+  detail: string;
+  content: string;
+}): ArticleLocal {
+  const localArticle: ArticleLocal = {
+    uid,
+    headline,
+    detail,
+    content,
   };
+  return localArticle;
 }
