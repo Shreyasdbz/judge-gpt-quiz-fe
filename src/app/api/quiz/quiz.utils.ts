@@ -29,20 +29,93 @@ export async function fetchArticlesForUserFromDb({
   if (userResult == null) {
     return "User not found";
   }
-  const articlesToExclude: string[] = userResult.servedArticles;
 
-  // TODO: Implement locale logic
-  // Based on users's local fetch articles that have origin_locale as the user's locale
-  // If less than 5 articles are found, fetch other articles
-  const articlesResult = await ArticleDb.find({
+  // Article selection logic ~~
+  let articlesToExclude: string[] = [];
+  // Exclude articles that have already been served to the user
+  if (userResult.served_articles != null) {
+    articlesToExclude = userResult.served_articles;
+  }
+  // Limit fetching articles where origin_locale is the user's locale
+  // Fetch articles from the database
+  const fetchedArticles = await ArticleDb.find({
     uid: { $nin: articlesToExclude },
     origin_locale: { $eq: locale },
   }).limit(MAX_ARTICLES_PER_SESSION);
-  if (articlesResult == null) {
+
+  // If fetched articles are less than the limit, fetch articles from other locales
+  if (fetchedArticles.length < MAX_ARTICLES_PER_SESSION) {
+    const remainingArticlesCount =
+      MAX_ARTICLES_PER_SESSION - fetchedArticles.length;
+    const remainingArticles = await ArticleDb.find({
+      uid: { $nin: articlesToExclude },
+      origin_locale: { $ne: locale },
+    }).limit(remainingArticlesCount);
+    fetchedArticles.push(...remainingArticles);
+  }
+
+  if (fetchedArticles == null) {
     return "No articles found";
   }
 
-  return articlesResult.map(sanitizeArticleToArticleLocal);
+  // If limit still not reached, errror out
+  if (fetchedArticles.length < MAX_ARTICLES_PER_SESSION) {
+    return "Not enough articles found";
+  }
+
+  // For each article where locale, sanitize and return
+  const articlesLocal: ArticleLocal[] = [];
+
+  for (const article of fetchedArticles) {
+    if (article.origin_locale === locale) {
+      articlesLocal.push({
+        uid: article.uid,
+        headline: article.headline,
+        detail: article.detail,
+        content: article.content,
+      });
+    } else {
+      // Map users's locale to each translation
+      if (locale === "en") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_en,
+          detail: article.localized_detail_en,
+          content: article.localized_content_en,
+        });
+      } else if (locale === "es") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_es,
+          detail: article.localized_detail_es,
+          content: article.localized_content_es,
+        });
+      } else if (locale === "fr") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_fr,
+          detail: article.localized_detail_fr,
+          content: article.localized_content_fr,
+        });
+      } else if (locale === "de") {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.localized_headline_de,
+          detail: article.localized_detail_de,
+          content: article.localized_content_de,
+        });
+      } else {
+        articlesLocal.push({
+          uid: article.uid,
+          headline: article.headline,
+          detail: article.detail,
+          content: article.content,
+        });
+      }
+    }
+  }
+
+  return articlesLocal;
 }
 
 /**
@@ -82,14 +155,16 @@ export async function storeUserResponseOnDb({
   }
 
   // Step 3: Update the user profile with the served article
-  if (userResult.servedArticles == null) {
-    userResult.servedArticles = [articleUid];
+  if (userResult.served_articles == null) {
+    userResult.served_articles = [];
+    userResult.served_articles.push(articleUid);
   } else {
-    userResult.servedArticles.push(articleUid);
+    userResult.served_articles.push(articleUid);
   }
   // Step 4: Increment the total score of the user profile if the user response is correct
-  if (userRespondedIsFake === articleResult.isFake) {
-    userResult.totalScore += 1;
+  const isFakeResponseBoolean = userRespondedIsFake === 1 ? true : false;
+  if (isFakeResponseBoolean === articleResult.is_fake) {
+    userResult.total_score += 1;
   }
 
   // Step 5: Save the updated user profile to the database
@@ -120,23 +195,3 @@ export async function storeUserResponseOnDb({
  * Internal functions
  * ////////////////////////////////////////////////
  */
-
-function sanitizeArticleToArticleLocal({
-  uid,
-  headline,
-  detail,
-  content,
-}: {
-  uid: string;
-  headline: string;
-  detail: string;
-  content: string;
-}): ArticleLocal {
-  const localArticle: ArticleLocal = {
-    uid,
-    headline,
-    detail,
-    content,
-  };
-  return localArticle;
-}
