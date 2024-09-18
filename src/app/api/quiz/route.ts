@@ -9,6 +9,7 @@ import {
  * Returns a set of quiz questions for the user to answer. Returns a message or error.
  * @param req: NextRequest
  * - query: { userUid: string }
+ * - body: { locale: string }
  * @returns
  * - status: 200 | 400 | 404 | 500
  * - body: ArticleLocal[] | { error: string }
@@ -45,7 +46,10 @@ async function GET(req: NextRequest) {
     }
 
     // Fetch quiz questions for the user from the server
-    const questions = await fetchArticlesForUserFromDb(userUid);
+    const questions = await fetchArticlesForUserFromDb({
+      userUid,
+      locale,
+    });
     if (!questions) {
       return NextResponse.json(
         { error: "Quiz questions not found" },
@@ -178,6 +182,7 @@ async function POST(req: NextRequest) {
 
     // Error handling
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

@@ -6,9 +6,7 @@ import { cn, decodeHTMLEntities } from "@/lib/utils";
 import { Send, ShieldCheck, ShieldX } from "lucide-react";
 import { MAX_ARTICLES_PER_SESSION } from "@/models/Article";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { SupportedLocales } from "@/i18n/routing";
-import { QuizSession } from "@/models/QuizSession";
+import { QuizSession } from "@/models/Response";
 
 interface QuizViewProps {
   quizSession: QuizSession;
@@ -25,115 +23,23 @@ interface QuizViewProps {
   }): void;
 }
 const QuizView = ({
+  quizSession,
   humanAiOptionChecked,
   setHumanAiOptionChecked,
   realFakeOptionChecked,
   setRealFakeOptionChecked,
-  ...props
+  onSubmitCallback,
 }: QuizViewProps) => {
-  const params = useParams();
   const translations = useTranslations("Quiz");
 
-  /**
-   * Tries to use locale to get appropriate article title.
-   * Defaults to English if locale is not available.
-   */
-  function getLocalizedTitle(): string {
-    const locale = params.locale as string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (SupportedLocales.includes(locale as any)) {
-      const baseTitle = decodeHTMLEntities(
-        props.quizSession.articles[props.quizSession.currentArticleIndex].title
-      );
-      switch (locale) {
-        case "en":
-          const localizedTitleEn =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedTitleEn;
-          return !localizedTitleEn || localizedTitleEn === ""
-            ? baseTitle
-            : decodeHTMLEntities(localizedTitleEn);
-        case "es":
-          const localizedTitleEs =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedTitleEs;
-          return !localizedTitleEs || localizedTitleEs === ""
-            ? baseTitle
-            : decodeHTMLEntities(localizedTitleEs);
-        case "fr":
-          const localizedTitleFr =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedTitleFr;
-          return !localizedTitleFr || localizedTitleFr === ""
-            ? baseTitle
-            : decodeHTMLEntities(localizedTitleFr);
-        case "de":
-          const localizedTitleDe =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedTitleDe;
-          return !localizedTitleDe || localizedTitleDe === ""
-            ? baseTitle
-            : decodeHTMLEntities(localizedTitleDe);
-        default:
-          return decodeHTMLEntities(baseTitle);
-      }
-    } else {
-      return decodeHTMLEntities(
-        props.quizSession.articles[props.quizSession.currentArticleIndex].title
-      );
-    }
+  function getArticleHeadline() {
+    return quizSession.articles[quizSession.currentArticleIndex].headline;
   }
 
-  /**
-   * Tries to use locale to get appropriate article content.
-   * Defaults to English if locale is not available.
-   */
-  function getLocalizedContent(): string {
-    const locale = params.locale as string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (SupportedLocales.includes(locale as any)) {
-      const baseContent = decodeHTMLEntities(
-        props.quizSession.articles[props.quizSession.currentArticleIndex]
-          .content
-      );
-      switch (locale) {
-        case "en":
-          const localizedContentEn =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedContentEn;
-          return !localizedContentEn || localizedContentEn === ""
-            ? baseContent
-            : decodeHTMLEntities(localizedContentEn);
-        case "es":
-          const localizedContentEs =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedContentEs;
-          return !localizedContentEs || localizedContentEs === ""
-            ? baseContent
-            : decodeHTMLEntities(localizedContentEs);
-        case "fr":
-          const localizedContentFr =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedContentFr;
-          return !localizedContentFr || localizedContentFr === ""
-            ? baseContent
-            : decodeHTMLEntities(localizedContentFr);
-        case "de":
-          const localizedContentDe =
-            props.quizSession.articles[props.quizSession.currentArticleIndex]
-              .localizedContentDe;
-          return !localizedContentDe || localizedContentDe === ""
-            ? baseContent
-            : decodeHTMLEntities(localizedContentDe);
-        default:
-          return decodeHTMLEntities(baseContent);
-      }
-    } else {
-      return decodeHTMLEntities(
-        props.quizSession.articles[props.quizSession.currentArticleIndex]
-          .content
-      );
-    }
+  function getArticleContent() {
+    return decodeHTMLEntities(
+      quizSession.articles[quizSession.currentArticleIndex].content
+    );
   }
 
   const HumanAiButton = (variant: "human" | "ai") => {
@@ -197,12 +103,12 @@ const QuizView = ({
       <div className="flex flex-col items-center justify-start w-full h-full">
         {/* Article headline */}
         <span className="w-full text-left text-2xl font-medium pb-1">
-          {getLocalizedTitle()}
+          {getArticleHeadline()}
         </span>
         {/* Article content */}
         <div className="bg-muted/50 w-full border border-muted-foreground/20 px-2 md:px-4 py-2 overflow-y-scroll h-full  max-h-[45vh] md:max-h-[55vh] rounded-cmd">
           <blockquote className="text-primary/80 font-serif">
-            {getLocalizedContent()}
+            {getArticleContent()}
           </blockquote>
         </div>
       </div>
@@ -240,10 +146,10 @@ const QuizView = ({
                 key={index}
                 className={cn(
                   "w-2 h-2 rounded-full bg-muted-foreground/20",
-                  index < props.quizSession.currentArticleIndex + 1 &&
+                  index < quizSession.currentArticleIndex + 1 &&
                     "bg-primary/80",
                   // wider if active question
-                  index === props.quizSession.currentArticleIndex && "w-4"
+                  index === quizSession.currentArticleIndex && "w-4"
                 )}
               />
             ))}
@@ -256,7 +162,7 @@ const QuizView = ({
             className="flex items-center justify-center gap-4 rounded-full"
             onClick={() => {
               if (humanAiOptionChecked && realFakeOptionChecked) {
-                props.onSubmitCallback({
+                onSubmitCallback({
                   humanOptionSelected: humanAiOptionChecked === "human",
                   isFakeSelected: realFakeOptionChecked === "fake",
                 });

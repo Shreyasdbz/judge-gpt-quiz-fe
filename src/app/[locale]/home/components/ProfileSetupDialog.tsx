@@ -38,7 +38,6 @@ const ProfileSetupDialog = () => {
       employmentStatus: "",
       politicalAffiliation: "",
       consentToDataCollection: false,
-      language: "en",
     },
   });
 
@@ -52,16 +51,20 @@ const ProfileSetupDialog = () => {
     } else {
       // Create a new profile
       createNewProfile({
+        uid: generateRandomUid(),
+        createdAt: new Date(),
         username: values.username,
+        gender: values.gender,
         ageGroup: values.age,
         educationLevel: values.educationLevel,
         employmentStatus: values.employmentStatus,
-        gender: values.gender,
         politicalAffiliation: values.politicalAffiliation,
         locale: userLocale,
-        servedArticles: [],
+        userAgent: navigator.userAgent,
+        screenResolution: `${window.screen.width}x${window.screen.height}`,
+        ipGeoLocation: "",
         totalScore: 0,
-        uid: generateRandomUid(),
+        servedArticles: [],
       });
     }
   }

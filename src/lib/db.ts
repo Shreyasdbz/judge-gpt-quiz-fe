@@ -6,13 +6,13 @@ declare global {
 }
 
 const MongoDbConnectionString = process.env.MONGO_DB_CONNECTION_STRING || "";
-const MongoDbDatabaseNameDev = process.env.MONGO_DB_DATABASE_NAME_DEV || "";
+const MongoDbDatabaseName = process.env.MONGO_DB_DATABASE_NAME || "";
 
 if (!MongoDbConnectionString || MongoDbConnectionString === "") {
   throw new Error("MongoDbConnectionString is not defined");
 }
-if (!MongoDbDatabaseNameDev || MongoDbDatabaseNameDev === "") {
-  throw new Error("MongoDbDatabaseNameDev is not defined");
+if (!MongoDbDatabaseName || MongoDbDatabaseName === "") {
+  throw new Error("MongoDbDatabaseName is not defined");
 }
 
 let cached = global.mongoose;
@@ -21,6 +21,10 @@ if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
+/**
+ * Connects to the MongoDB database using the connection string and database name.
+ * @returns mongoose connection
+ */
 async function connectToDatabase() {
   if (cached.conn) {
     return cached.conn;
@@ -29,7 +33,7 @@ async function connectToDatabase() {
     cached.promise = mongoose
       .connect(MongoDbConnectionString, {
         bufferCommands: false,
-        dbName: MongoDbDatabaseNameDev,
+        dbName: MongoDbDatabaseName,
       })
       .then((mongoose) => {
         return mongoose;
@@ -45,6 +49,9 @@ async function connectToDatabase() {
   return cached.conn;
 }
 
+/**
+ * Closes the connection to the MongoDB database.
+ */
 async function closeDatabase() {
   try {
     if (cached.conn) {

@@ -99,6 +99,7 @@ async function POST(req: NextRequest) {
     if (!data) {
       return NextResponse.json({ error: "Bad Request" }, { status: 400 });
     }
+
     const {
       createdAt,
       username,

@@ -1,9 +1,7 @@
+import EmptyPageBlock from "@/components/blocks/EmptyPageBlock";
+
 const AboutPage = () => {
-  return (
-    <div>
-      <h1>About Page</h1>
-    </div>
-  );
+  return <EmptyPageBlock pageName="About" />;
 };
 
 export default AboutPage;

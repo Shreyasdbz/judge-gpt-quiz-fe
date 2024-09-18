@@ -15,26 +15,28 @@ import { connectToDatabase } from "@/lib/db";
  * @param userUid
  * @returns
  */
-export async function fetchArticlesForUserFromDb(
-  userUid: string
-): Promise<ArticleLocal[] | string> {
+export async function fetchArticlesForUserFromDb({
+  userUid,
+  locale,
+}: {
+  userUid: string;
+  locale: string;
+}): Promise<ArticleLocal[] | string> {
   await connectToDatabase();
 
-  // Step 1: Get user profile from the database
+  // Get user profile from the database
   const userResult = await ProfileDb.findOne({ uid: userUid });
   if (userResult == null) {
     return "User not found";
   }
   const articlesToExclude: string[] = userResult.servedArticles;
 
-  // Step 2: Locale logic
   // TODO: Implement locale logic
   // Based on users's local fetch articles that have origin_locale as the user's locale
   // If less than 5 articles are found, fetch other articles
-
-  // Step 3: Fetch articles from the database and exclude the served articles (limit of 5)
   const articlesResult = await ArticleDb.find({
     uid: { $nin: articlesToExclude },
+    origin_locale: { $eq: locale },
   }).limit(MAX_ARTICLES_PER_SESSION);
   if (articlesResult == null) {
     return "No articles found";
@@ -80,7 +82,11 @@ export async function storeUserResponseOnDb({
   }
 
   // Step 3: Update the user profile with the served article
-  userResult.servedArticles.push(articleUid);
+  if (userResult.servedArticles == null) {
+    userResult.servedArticles = [articleUid];
+  } else {
+    userResult.servedArticles.push(articleUid);
+  }
   // Step 4: Increment the total score of the user profile if the user response is correct
   if (userRespondedIsFake === articleResult.isFake) {
     userResult.totalScore += 1;
@@ -92,7 +98,7 @@ export async function storeUserResponseOnDb({
     return "Error updating user profile";
   }
 
-  // Step 6: Store in sessions collection
+  // Step 6: Store in responses collection
   const responseResult = await ResponseDb.create({
     timestamp: new Date(),
     user_uid: userUid,

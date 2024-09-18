@@ -1,9 +1,7 @@
+import EmptyPageBlock from "@/components/blocks/EmptyPageBlock";
+
 const PolicyPage = () => {
-  return (
-    <div>
-      <h1>Policy Page</h1>
-    </div>
-  );
+  return <EmptyPageBlock pageName="Policy" />;
 };
 
 export default PolicyPage;
