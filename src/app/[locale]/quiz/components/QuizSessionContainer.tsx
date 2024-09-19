@@ -86,6 +86,10 @@ const QuizSessionContainer = () => {
     return null;
   }
 
+  const articleIsFake = false;
+  const whyFake = "TODO: Implement this";
+  const whyReal = "TODO: link to source";
+
   if (quizSession.articles.length === 0) {
     return (
       <div className="w-full h-full items-center justify-center flex">
@@ -129,6 +133,7 @@ const QuizSessionContainer = () => {
                 : getRandomFeedback(userResult)}
             </AlertDialogTitle>
             <AlertDialogDescription className="w-full justify-center flex items-center">
+            <div>
               {userResult === null && (
                 <span>
                   {quizTranslations("quizViewSubmitProcessingSubtitle")}
@@ -146,6 +151,14 @@ const QuizSessionContainer = () => {
                   size={24}
                 />
               )}
+            </div>
+            {userResult === false && (
+              <div>
+                <p>
+                    { articleIsFake ? whyFake : whyReal }
+                </p>
+              </div>
+            )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

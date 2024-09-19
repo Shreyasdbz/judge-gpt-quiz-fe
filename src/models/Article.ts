@@ -5,4 +5,6 @@ export interface ArticleLocal {
   headline: string;
   detail: string;
   content: string;
+  // reason fake?
+  // source if real?
 }
