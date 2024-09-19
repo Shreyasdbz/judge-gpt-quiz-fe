@@ -73,6 +73,8 @@ export async function fetchArticlesForUserFromDb({
         headline: article.headline,
         detail: article.detail,
         content: article.content,
+        is_fake: article.is_fake,
+        style_or_source: article.style_or_source,
       });
     } else {
       // Map users's locale to each translation
@@ -82,6 +84,8 @@ export async function fetchArticlesForUserFromDb({
           headline: article.localized_headline_en,
           detail: article.localized_detail_en,
           content: article.localized_content_en,
+          is_fake: article.is_fake,
+          style_or_source: article.style_or_source,
         });
       } else if (locale === "es") {
         articlesLocal.push({
@@ -89,6 +93,8 @@ export async function fetchArticlesForUserFromDb({
           headline: article.localized_headline_es,
           detail: article.localized_detail_es,
           content: article.localized_content_es,
+          is_fake: article.is_fake,
+          style_or_source: article.style_or_source,
         });
       } else if (locale === "fr") {
         articlesLocal.push({
@@ -96,6 +102,8 @@ export async function fetchArticlesForUserFromDb({
           headline: article.localized_headline_fr,
           detail: article.localized_detail_fr,
           content: article.localized_content_fr,
+          is_fake: article.is_fake,
+          style_or_source: article.style_or_source,
         });
       } else if (locale === "de") {
         articlesLocal.push({
@@ -103,6 +111,8 @@ export async function fetchArticlesForUserFromDb({
           headline: article.localized_headline_de,
           detail: article.localized_detail_de,
           content: article.localized_content_de,
+          is_fake: article.is_fake,
+          style_or_source: article.style_or_source,
         });
       } else {
         articlesLocal.push({
@@ -110,6 +120,8 @@ export async function fetchArticlesForUserFromDb({
           headline: article.headline,
           detail: article.detail,
           content: article.content,
+          is_fake: article.is_fake,
+          style_or_source: article.style_or_source,
         });
       }
     }

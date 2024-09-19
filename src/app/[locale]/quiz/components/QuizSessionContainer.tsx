@@ -86,9 +86,9 @@ const QuizSessionContainer = () => {
     return null;
   }
 
-  const articleIsFake = false;
-  const whyFake = "TODO: Implement this";
-  const whyReal = "TODO: link to source";
+  const articleIsFake = quizSession.articles[quizSession.currentArticleIndex].is_fake;
+  const whyFake = "This headline and article were generated using AI!";
+  const whyReal = quizSession.articles[quizSession.currentArticleIndex].style_or_source;
 
   if (quizSession.articles.length === 0) {
     return (
