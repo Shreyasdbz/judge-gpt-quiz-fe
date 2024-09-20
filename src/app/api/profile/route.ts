@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getUserProfileLocalFromDb,
   createNewUserProfileOnDb,
+  getGeoLocationInfo,
 } from "./profile.utils";
 import { Profile } from "@/models/Profile";
+import { IpGeoInfoDb } from "@/models/ProfileDb";
 
 /**
  * [GET] /api/profile
@@ -54,6 +56,7 @@ async function GET(req: NextRequest) {
  * [POST] /api/profile
  * Creates a new user profile on the server and returns the local profile.
  * @param req: NextRequest
+ * - headers: { x-forwarded-for: string }
  * - query: { uid: string }
  * - body: {
  *            createdAt: Date,
@@ -73,6 +76,14 @@ async function GET(req: NextRequest) {
  */
 async function POST(req: NextRequest) {
   try {
+    // Get headers for "x-forwarded-for" property
+    const originIpAddr = req.headers.get("x-forwarded-for");
+    if (!originIpAddr) {
+      return NextResponse.json(
+        { error: "IP Address not found in headers" },
+        { status: 400 }
+      );
+    }
     // Get the uid from query parameters
     const { searchParams } = new URL(req.url);
     if (!searchParams) {
@@ -111,7 +122,6 @@ async function POST(req: NextRequest) {
       locale,
       userAgent,
       screenResolution,
-      ipGeoLocation,
     } = data;
     if (
       !createdAt ||
@@ -123,10 +133,16 @@ async function POST(req: NextRequest) {
       !politicalAffiliation ||
       !locale ||
       !userAgent ||
-      !screenResolution ||
-      !ipGeoLocation
+      !screenResolution
     ) {
       return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+    }
+
+    // Get IP Address Geo Location Information
+    let ipGeoInfo: IpGeoInfoDb = {};
+    const geoLocation = await getGeoLocationInfo(originIpAddr);
+    if (geoLocation) {
+      ipGeoInfo = geoLocation;
     }
 
     // Create a new user profile on the server and return local profile (if successful)
@@ -142,11 +158,10 @@ async function POST(req: NextRequest) {
       locale,
       userAgent,
       screenResolution,
-      ipGeoLocation,
       totalScore: 0,
       servedArticles: [],
     };
-    const result = await createNewUserProfileOnDb(newProfile);
+    const result = await createNewUserProfileOnDb({ newProfile, ipGeoInfo });
     if (typeof result === "string") {
       return NextResponse.json(
         { error: "Internal Server Error" },
@@ -203,7 +218,6 @@ async function PUT(req: NextRequest) {
     locale,
     userAgent,
     screenResolution,
-    ipGeoLocation,
   } = data;
   if (
     !gender ||
@@ -213,16 +227,10 @@ async function PUT(req: NextRequest) {
     !politicalAffiliation ||
     !locale ||
     !userAgent ||
-    !screenResolution ||
-    !ipGeoLocation
+    !screenResolution
   ) {
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
-  // Check if uid exists on the server
-  // If not, error out
-
-  // Valid paths
-  // Update the user profile on the server and return local profile
 }
 
 /**

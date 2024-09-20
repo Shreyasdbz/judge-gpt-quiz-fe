@@ -15,7 +15,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "A1B2C3",
@@ -31,7 +30,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "D4E5F6",
@@ -47,7 +45,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "G7H8I9",
@@ -63,7 +60,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "J1K2L3",
@@ -79,7 +75,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "M4N5O6",
@@ -95,7 +90,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "P7Q8R9",
@@ -111,7 +105,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "S1T2U3",
@@ -127,7 +120,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "V4W5X6",
@@ -143,7 +135,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "Y7Z8A9",
@@ -159,7 +150,6 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
   {
     uid: "B1C2D3",
@@ -175,6 +165,5 @@ export const MockProfiles: Profile[] = [
     createdAt: new Date(),
     userAgent: "",
     screenResolution: "",
-    ipGeoLocation: "",
   },
 ];

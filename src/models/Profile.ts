@@ -61,7 +61,6 @@ export enum PoliticalAffiliationOptions {
  * @param locale - User's locale
  * @param userAgent - User's user agent
  * @param screenResolution - User's screen resolution
- * @param ipGeoLocation - User's IP-address based geolocation
  * @param totalScore - User's total score
  * @param servedArticles - List of IDs of articles served to the user
  */
@@ -77,7 +76,6 @@ export interface Profile {
   locale: string;
   userAgent: string;
   screenResolution: string;
-  ipGeoLocation: string;
   totalScore: number;
   servedArticles: string[];
 }
@@ -97,11 +95,7 @@ export interface Profile {
 export interface ProfileLocal
   extends Omit<
     Profile,
-    | "createdAt"
-    | "userAgent"
-    | "screenResolution"
-    | "ipGeoLocation"
-    | "servedArticles"
+    "createdAt" | "userAgent" | "screenResolution" | "servedArticles"
   > {}
 
 /**

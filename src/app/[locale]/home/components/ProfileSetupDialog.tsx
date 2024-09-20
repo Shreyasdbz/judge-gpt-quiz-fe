@@ -62,7 +62,6 @@ const ProfileSetupDialog = () => {
         locale: userLocale,
         userAgent: navigator.userAgent,
         screenResolution: `${window.screen.width}x${window.screen.height}`,
-        ipGeoLocation: "",
         totalScore: 0,
         servedArticles: [],
       });
