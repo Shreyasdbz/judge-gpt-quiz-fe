@@ -16,6 +16,7 @@ export enum AgeGroupOptions {
   From35To44 = "From35To44",
   From45To54 = "From45To54",
   Above54 = "Above54",
+  DeclineToSay = "DeclineToSay",
 }
 
 export enum EducationLevelOptions {
@@ -26,6 +27,7 @@ export enum EducationLevelOptions {
   Masters = "Masters",
   PhD = "PhD",
   Other = "Other",
+  DeclineToSay = "DeclineToSay",
 }
 
 export enum EmploymentStatusOptions {
@@ -34,6 +36,7 @@ export enum EmploymentStatusOptions {
   Student = "Student",
   Retired = "Retired",
   Other = "Other",
+  DeclineToSay = "DeclineToSay",
 }
 
 export enum PoliticalAffiliationOptions {
@@ -42,6 +45,7 @@ export enum PoliticalAffiliationOptions {
   Moderate = "Moderate",
   Progressive = "Progressive",
   VeryProgressive = "VeryProgressive",
+  DeclineToSay = "DeclineToSay",
 }
 
 /**
