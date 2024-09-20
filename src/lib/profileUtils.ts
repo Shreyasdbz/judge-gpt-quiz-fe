@@ -111,7 +111,6 @@ export async function createNewProfileOnServer(
         locale: profile.locale,
         userAgent: profile.userAgent,
         screenResolution: profile.screenResolution,
-        ipGeoLocation: "NA",
       },
       {
         params: {
