@@ -14,6 +14,7 @@ import {
   fetchProfileUidFromLocalStorage,
   storeProfileUidInLocalStorage,
   createNewProfileOnServer,
+  updateProfileOnServer,
   fetchLocalProfile,
 } from "@/lib/profileUtils";
 import {
@@ -26,6 +27,7 @@ interface UserSessionProviderProps {
   localProfile: ProfileLocal | null;
   quizSession: QuizSession | null;
   createNewProfile: (profileToCreate: Profile) => void;
+  updateProfile: (profileToUpdate: Partial<Profile>) => Promise<boolean>;
   createNewQuizSession: ({
     newUserUid,
     isPreload,
@@ -61,6 +63,10 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
   const [localProfile, setLocalProfile] = useState<ProfileLocal | null>(null);
   const [quizSession, setQuizSession] = useState<QuizSession | null>(null);
 
+  /**
+   * Create a new profile on the server and set the local profile.
+   * @param profileToCreate
+   */
   async function createNewProfile(profileToCreate: Profile) {
     // Step 1: Create the profile on the server
     setIsLoading(true);
@@ -78,6 +84,41 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
+  /**
+   * Update the user profile on the server and set the local profile.
+   * @param profileToUpdate
+   * @returns
+   */
+  async function updateProfile(
+    profileToUpdate: Partial<Profile>
+  ): Promise<boolean> {
+    setIsLoading(true);
+    if (localProfile == null) {
+      setIsLoading(false);
+      return false;
+    }
+    const result = await updateProfileOnServer({
+      uid: localProfile.uid,
+      profile: {
+        ...localProfile,
+        ...profileToUpdate,
+      },
+    });
+    if (result != null) {
+      setLocalProfile(result);
+      setIsLoading(false);
+      return true;
+    } else {
+      setIsLoading(false);
+      return false;
+    }
+  }
+
+  /**
+   * Start a new quiz session.
+   * @param param0
+   * @returns
+   */
   async function createNewQuizSession({
     newUserUid,
     isPreload = false,
@@ -94,7 +135,10 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
       router.push("/quiz");
       return;
     }
-    const localUid = newUserUid || (await fetchProfileUidFromLocalStorage());
+    const localUid =
+      newUserUid ||
+      localProfile?.uid ||
+      (await fetchProfileUidFromLocalStorage());
     // Make sure user profile & localUid is available
     if (localProfile == null || localUid == null) {
       setIsLoading(false);
@@ -118,6 +162,11 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
+  /**
+   * Record an answer to a quiz question.
+   * @param param0
+   * @returns
+   */
   async function recordUserResponse({
     articleUid,
     humanOptionSelected,
@@ -136,7 +185,8 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
       return null;
     }
 
-    const localUid = await fetchProfileUidFromLocalStorage();
+    const localUid =
+      localProfile.uid || (await fetchProfileUidFromLocalStorage());
     if (localUid == null) {
       return null;
     }
@@ -158,6 +208,10 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     return answerResult;
   }
 
+  /**
+   * After recording a response, increment the current article index.
+   * @returns
+   */
   async function incrementCurrentArticleIndex() {
     if (quizSession == null) {
       return;
@@ -172,6 +226,9 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
+  /**
+   * End the quiz session and navigate to the scores page.
+   */
   async function endQuizSession() {
     setQuizSession(null);
     router.push("/scores");
@@ -182,6 +239,7 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     localProfile,
     quizSession,
     createNewProfile,
+    updateProfile,
     createNewQuizSession,
     recordUserResponse,
     incrementCurrentArticleIndex,

@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import HomePage from "./home/page";
 
-const Root = () => {
-  redirect("/en/home");
+const RootPage = () => {
+  return <HomePage />;
 };
 
-export default Root;
+export default RootPage;

@@ -1,0 +1,15 @@
+meta {
+  name: Get Avatars
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/profile/avatar?avatarId=all
+  body: none
+  auth: none
+}
+
+params:query {
+  avatarId: all
+}

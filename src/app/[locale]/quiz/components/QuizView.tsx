@@ -102,11 +102,11 @@ const QuizView = ({
       {/* Article Section */}
       <div className="flex flex-col items-center justify-start w-full h-full">
         {/* Article headline */}
-        <span className="w-full text-left text-2xl font-medium pb-1">
+        <span className="w-full text-left text-xl font-medium pb-1">
           {getArticleHeadline()}
         </span>
         {/* Article content */}
-        <div className="bg-muted/50 w-full border border-muted-foreground/20 px-2 md:px-4 py-2 overflow-y-scroll h-full  max-h-[45vh] md:max-h-[55vh] rounded-cmd">
+        <div className="bg-muted/50 w-full border border-muted-foreground/20 px-2 md:px-4 py-2 overflow-y-scroll h-full  max-h-[40vh] md:max-h-[55vh] rounded-cmd">
           <blockquote className="text-primary/80 font-serif">
             {getArticleContent()}
           </blockquote>

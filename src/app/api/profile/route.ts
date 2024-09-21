@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getUserProfileLocalFromDb,
   createNewUserProfileOnDb,
+  updateUserProfileOnDb,
   getGeoLocationInfo,
 } from "./profile.utils";
 import { Profile } from "@/models/Profile";
@@ -183,7 +184,16 @@ async function POST(req: NextRequest) {
  * Updates the user profile on the server and returns the local profile.
  * @param req: NextRequest
  * - query: { uid: string }
- * - body: { uid: string, gender, ageGroup, educationLevel, employmentStatus, politicalAffiliation }
+ * - body: {
+ *    gender?: string,
+ *    ageGroup?: string,
+ *    educationLevel?: string,
+ *    employmentStatus?: string,
+ *    politicalAffiliation?: string,
+ *    locale?: string,
+ *     userAgent?: string,
+ *    screenResolution?: string,
+ *  }
  * @param res: NextResponse
  * - status: 200 | 400 | 500
  * - body: ProfileLocal | { error: string }
@@ -219,17 +229,26 @@ async function PUT(req: NextRequest) {
     userAgent,
     screenResolution,
   } = data;
-  if (
-    !gender ||
-    !ageGroup ||
-    !educationLevel ||
-    !employmentStatus ||
-    !politicalAffiliation ||
-    !locale ||
-    !userAgent ||
-    !screenResolution
-  ) {
-    return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+
+  const updateResult = await updateUserProfileOnDb({
+    uid,
+    gender,
+    ageGroup,
+    educationLevel,
+    employmentStatus,
+    politicalAffiliation,
+    locale,
+    userAgent,
+    screenResolution,
+  });
+
+  if (typeof updateResult === "string") {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  } else {
+    return NextResponse.json(updateResult, { status: 200 });
   }
 }
 

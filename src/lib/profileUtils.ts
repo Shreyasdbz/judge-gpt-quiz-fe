@@ -2,6 +2,7 @@ import {
   LOCAL_STORAGE_KEY_PROFILE,
   Profile,
   ProfileLocal,
+  ProfileStatistics,
 } from "@/models/Profile";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
@@ -78,7 +79,7 @@ export async function checkIfUsernameIsAvailable(username: string) {
     return;
   }
   try {
-    const response = await axios.get("/api/username", {
+    const response = await axios.get("/api/profile/username", {
       params: { username },
     });
     if (response.status === 200) {
@@ -121,6 +122,56 @@ export async function createNewProfileOnServer(
     if (response.status === 200) {
       const createdLocalProfile = response.data as ProfileLocal;
       return createdLocalProfile;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Makes a PUT request to update the user profile on the server.
+ * @param uid: string
+ * @param profile: Partial<Profile>
+ * @returns ProfileLocal | null
+ */
+export async function updateProfileOnServer({
+  uid,
+  profile,
+}: {
+  uid: string;
+  profile: Partial<Profile>;
+}): Promise<ProfileLocal | null> {
+  try {
+    const response = await axios.put(`/api/profile`, profile, {
+      params: { uid },
+    });
+    if (response.status === 200) {
+      const updatedLocalProfile = response.data as ProfileLocal;
+      return updatedLocalProfile;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Makes a GET request to fetch the user status from the server.
+ * @param param0
+ * @returns
+ */
+export async function getUserStatusFromServer({
+  uid,
+}: {
+  uid: string;
+}): Promise<ProfileStatistics | null> {
+  try {
+    const response = await axios.get(`/api/profile/stats?uid=${uid}`);
+    if (response.status === 200) {
+      return response.data.statsResult as ProfileStatistics;
     } else {
       return null;
     }
