@@ -28,14 +28,15 @@ const AboutPage = () => {
               authenticity in machine-generated vs. human-generated news. This
               pioneering work aims to gather insights on how individuals discern
               between real and artificial news content in an era of rapidly
-              advancing language models. 🔍 Want to test your judgment? If
-              you're interested in seeing this application in action and would
-              like to participate in the evaluation of fake news, please visit
-              our interactive survey at https://judgegpt.streamlit.app/. A port
-              to React is currently in development, and can be beta tested at
-              https://aka.ms/JudgeGPT. 🧠 Curious about spotting fake news? If
-              you want to learn more about spotting fake news, especially during
-              election periods, check out this blog post for tips and insights.
+              advancing language models. &#x1F50D; Want to test your judgment?
+              If you&apos;re interested in seeing this application in action and
+              would like to participate in the evaluation of fake news, please
+              visit our interactive survey at https://judgegpt.streamlit.app/. A
+              port to React is currently in development, and can be beta tested
+              at https://aka.ms/JudgeGPT. &#x1F9E0; Curious about spotting fake
+              news? If you want to learn more about spotting fake news,
+              especially during election periods, check out this blog post for
+              tips and insights.
             </p>
           </CardContent>
         </Card>
@@ -47,14 +48,14 @@ const AboutPage = () => {
             <p className="font-light w-full">
               JudgeGPT is an independent research project and is not affiliated
               with, endorsed by, or in any way officially connected to OpenAI.
-              The use of "GPT" within our project name is purely for descriptive
-              purposes, indicating the use of generative pre-trained transformer
-              models as a core technology in our research. Our project's
-              explorations and findings are our own and do not reflect the views
-              or positions of OpenAI or its collaborators. We are committed to
-              responsible AI research and adhere to ethical guidelines in all
-              aspects of our work, including the generation and analysis of
-              content.
+              The use of &quot;GPT&quot; within our project name is purely for
+              descriptive purposes, indicating the use of generative pre-trained
+              transformer models as a core technology in our research. Our
+              project&apos;s explorations and findings are our own and do not
+              reflect the views or positions of OpenAI or its collaborators. We
+              are committed to responsible AI research and adhere to ethical
+              guidelines in all aspects of our work, including the generation
+              and analysis of content.
             </p>
           </CardContent>
         </Card>
@@ -67,7 +68,7 @@ const AboutPage = () => {
               GitHub Repository:
               <a
                 href="https://github.com/Shreyasdbz/judge-gpt-quiz-fe"
-                target="blank"
+                target="_blank"
                 className="text-accent-foreground font-medium"
               >
                 Github

@@ -97,7 +97,7 @@ const PolicyPage = () => {
               internally or by trusted third parties.
               <br /> - Your information will only be used for non-commercial,
               non-political, scientific purposes to help us better understand
-              people's behavior related to misinformation.{" "}
+              people&apos;s behavior related to misinformation.{" "}
             </p>
           </CardContent>
         </Card>
