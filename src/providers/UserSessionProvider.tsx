@@ -15,6 +15,7 @@ import {
   storeProfileUidInLocalStorage,
   createNewProfileOnServer,
   updateProfileOnServer,
+  updateProfileAvatarOnServer,
   fetchLocalProfile,
 } from "@/lib/profileUtils";
 import {
@@ -28,6 +29,7 @@ interface UserSessionProviderProps {
   quizSession: QuizSession | null;
   createNewProfile: (profileToCreate: Profile) => void;
   updateProfile: (profileToUpdate: Partial<Profile>) => Promise<boolean>;
+  updateAvatar(url: string): Promise<boolean>;
   createNewQuizSession: ({
     newUserUid,
     isPreload,
@@ -47,7 +49,7 @@ interface UserSessionProviderProps {
     humanOptionSelected: boolean;
     isFakeSelected: boolean;
     timeToRespond: number;
-  }) => Promise<boolean | null>;
+  }) => Promise<{ correct: boolean; detail: string } | null>;
   incrementCurrentArticleIndex: () => void;
 }
 
@@ -106,6 +108,33 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     });
     if (result != null) {
       setLocalProfile(result);
+      setIsLoading(false);
+      return true;
+    } else {
+      setIsLoading(false);
+      return false;
+    }
+  }
+
+  /**
+   * Update the user avatar image URL.
+   * @param url
+   */
+  async function updateAvatar(url: string): Promise<boolean> {
+    setIsLoading(true);
+    if (localProfile == null) {
+      setIsLoading(false);
+      return false;
+    }
+    const result = await updateProfileAvatarOnServer({
+      uid: localProfile.uid,
+      avatarImageUrl: url,
+    });
+    if (result !== null && result === true) {
+      setLocalProfile({
+        ...localProfile,
+        avatarImageUrl: url,
+      });
       setIsLoading(false);
       return true;
     } else {
@@ -177,7 +206,10 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     humanOptionSelected: boolean;
     isFakeSelected: boolean;
     timeToRespond: number;
-  }): Promise<boolean | null> {
+  }): Promise<{
+    correct: boolean;
+    detail: string;
+  } | null> {
     if (localProfile == null) {
       return null;
     }
@@ -227,11 +259,11 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   /**
-   * End the quiz session and navigate to the scores page.
+   * End the quiz session and navigate to the profile.
    */
   async function endQuizSession() {
     setQuizSession(null);
-    router.push("/scores");
+    router.push("/profile");
   }
 
   const value: UserSessionProviderProps = {
@@ -240,6 +272,7 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     quizSession,
     createNewProfile,
     updateProfile,
+    updateAvatar,
     createNewQuizSession,
     recordUserResponse,
     incrementCurrentArticleIndex,

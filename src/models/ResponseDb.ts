@@ -9,6 +9,7 @@ export interface Responses extends mongoose.Document {
   time_to_respond: number;
   locale_responded_in: string;
   article_index: number;
+  user_guessed_correctly: boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ const ResponseSchema = new mongoose.Schema<Responses>({
   time_to_respond: { type: Number, required: true },
   locale_responded_in: { type: String, required: true },
   article_index: { type: Number, required: true },
+  user_guessed_correctly: { type: Boolean, required: true },
 });
 
 export default mongoose.models.Response ||

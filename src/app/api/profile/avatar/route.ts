@@ -3,18 +3,18 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getAllAvatarsFromDb, getAvatarByIdFromDb } from "../profile.utils";
+import { updateProfileAvatarOnDb } from "../profile.utils";
 
 /**
- * [GET] /api/profile/avatar
- * Retrieves all or a specific avatar
+ * [PUT] /api/profile/avatar
+ * Sets the user's avatar image URL
  * @param request: NextRequest
- * - query: { avatarId: ["id" or "all"] }
+ * - query: { uid: string }
+ * - body: { avatarImageUrl: string }
  * @return NextResponse
  * - status: 200 | 404 | 500
- * - body: { avatarData: Avatar[] }
  */
-async function GET(req: NextRequest) {
+async function PUT(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   if (!searchParams) {
     return NextResponse.json(
@@ -22,51 +22,40 @@ async function GET(req: NextRequest) {
       { status: 400 }
     );
   }
-  const avatarId = searchParams.get("avatarId");
-  if (!avatarId) {
+  const uid = searchParams.get("uid");
+  if (!uid) {
+    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+  }
+  if (typeof uid !== "string") {
+    return NextResponse.json({ error: "Invalid User ID" }, { status: 400 });
+  }
+  // Parse body
+  const data = await req.json();
+  if (!data) {
+    return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+  }
+  const { avatarImageUrl } = data;
+  if (!avatarImageUrl) {
     return NextResponse.json(
-      { error: "Avatar ID is required" },
+      { error: "Avatar Image URL is required" },
       { status: 400 }
     );
   }
 
-  if (avatarId === "all") {
-    const avatarsResult = await getAllAvatarsFromDb();
-    if (!avatarsResult) {
-      return NextResponse.json(
-        { error: "Failed to retrieve avatars" },
-        { status: 500 }
-      );
-    }
-
+  const result = await updateProfileAvatarOnDb({ uid, avatarImageUrl });
+  if (result === null) {
     return NextResponse.json(
-      { avatarData: avatarsResult },
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "image/jpeg",
-        },
-      }
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  } else if (result === false) {
+    return NextResponse.json(
+      { error: "Failed to update avatar image URL" },
+      { status: 404 }
     );
   } else {
-    const avatarResult = await getAvatarByIdFromDb(avatarId);
-    if (!avatarResult) {
-      return NextResponse.json(
-        { error: "Failed to retrieve avatar" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { avatarData: [avatarResult] },
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "image/jpeg",
-        },
-      }
-    );
+    return NextResponse.json({}, { status: 200 });
   }
 }
 
-export { GET };
+export { PUT };

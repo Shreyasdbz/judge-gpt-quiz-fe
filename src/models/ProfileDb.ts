@@ -62,6 +62,8 @@ export interface Profiles extends mongoose.Document {
   ip_geo_location: IpGeoInfoDb;
   total_score: number;
   served_articles: string[];
+  avatar_image_url: string;
+  achievements_unlocked: string[];
 }
 
 /**
@@ -113,6 +115,8 @@ const ProfileSchema = new mongoose.Schema<Profiles>({
   },
   total_score: { type: Number, required: true },
   served_articles: { type: [String], required: true },
+  avatar_image_url: { type: String, required: false },
+  achievements_unlocked: { type: [String], required: true },
 });
 
 export default mongoose.models.Profile ||

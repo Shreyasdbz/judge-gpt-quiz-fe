@@ -120,8 +120,16 @@ export async function fetchArticlesForUserFromDb({
 
 /**
  *  Stores the user's response to the quiz question.
- * @param param0
+ * @param userUid: string - User's unique identifier
+ * @param articleUid: string - Article's unique identifier
+ * @param userRespondedIsHuman: number - User's response to the question
+ * @param userRespondedIsFake: number - User's response to the question
+ * @param timeToRespond: number - Time taken by the user to respond
+ * @param localeRespondedIn: string - Locale in which the user responded
+ * @param articleIndex: number - Index of the article in the quiz session
  * @returns
+ * - { correct: boolean, detail: string } if the user response is correct
+ * - string if there is an error
  */
 export async function storeUserResponseOnDb({
   userUid,
@@ -139,7 +147,13 @@ export async function storeUserResponseOnDb({
   timeToRespond: number;
   localeRespondedIn: string;
   articleIndex: number;
-}): Promise<boolean | string> {
+}): Promise<
+  | {
+      correct: boolean;
+      detail: string;
+    }
+  | string
+> {
   await connectToDatabase();
 
   // Step 1: Get user profile from the database
@@ -174,6 +188,8 @@ export async function storeUserResponseOnDb({
   }
 
   // Step 6: Store in responses collection
+  const userRespondedCorrectly =
+    isFakeResponseBoolean === articleResult.is_fake;
   const responseResult = await ResponseDb.create({
     timestamp: new Date(),
     user_uid: userUid,
@@ -183,13 +199,35 @@ export async function storeUserResponseOnDb({
     time_to_respond: timeToRespond,
     locale_responded_in: localeRespondedIn,
     article_index: articleIndex,
+    user_guessed_correctly: userRespondedCorrectly,
   });
   if (responseResult == null) {
     return "Error storing user response";
   }
 
   // Step 7: Return if user response is correct
-  return isFakeResponseBoolean === articleResult.is_fake;
+  // + the detail why the response is correct
+  let localizedDetail = "";
+  switch (localeRespondedIn) {
+    case "en":
+      localizedDetail = articleResult.localized_detail_en;
+      break;
+    case "es":
+      localizedDetail = articleResult.localized_detail_es;
+      break;
+    case "fr":
+      localizedDetail = articleResult.localized_detail_fr;
+      break;
+    case "de":
+      localizedDetail = articleResult.localized_detail_de;
+      break;
+    default:
+      localizedDetail = articleResult.detail;
+  }
+  return {
+    correct: userRespondedCorrectly,
+    detail: localizedDetail,
+  };
 }
 
 /**

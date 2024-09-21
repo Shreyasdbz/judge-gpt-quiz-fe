@@ -1,8 +1,17 @@
 import axios from "axios";
-import { Profile, ProfileLocal, ProfileStatistics } from "@/models/Profile";
+import {
+  AgeGroupOptions,
+  BASIC_AVATAR_URL,
+  EducationLevelOptions,
+  EmploymentStatusOptions,
+  GenderOptions,
+  PoliticalAffiliationOptions,
+  Profile,
+  ProfileLocal,
+  ProfileStatistics,
+} from "@/models/Profile";
 import ProfileDb, { IpGeoInfoDb } from "@/models/ProfileDb";
 import ResponseDb from "@/models/ResponseDb";
-import AvatarDb from "@/models/AvatarDb";
 import { connectToDatabase } from "@/lib/db";
 
 /**
@@ -72,7 +81,20 @@ export async function getUserProfileLocalFromDb({
     // Query the database for the user profile
     const result = await ProfileDb.findOne({ uid });
     if (result) {
-      return sanitizeProfileToProfileLocal(result as Profile);
+      const localProfile: ProfileLocal = {
+        uid: result.uid,
+        username: result.username,
+        gender: result.gender,
+        ageGroup: result.age_group,
+        educationLevel: result.education_level,
+        employmentStatus: result.employment_status,
+        politicalAffiliation: result.political_affiliation,
+        locale: result.locale,
+        totalScore: result.total_score,
+        avatarImageUrl: result.avatar_image_url,
+        achievementsUnlocked: result.achievements_unlocked,
+      };
+      return localProfile;
     } else {
       return null;
     }
@@ -128,6 +150,8 @@ export async function createNewUserProfileOnDb({
     ip_geo_location: ipGeoInfo,
     total_score: newProfile.totalScore,
     served_articles: newProfile.servedArticles,
+    avatar_image_url: BASIC_AVATAR_URL,
+    achievements_unlocked: newProfile.achievementsUnlocked,
   });
   if (profileResult && typeof profileResult === "object") {
     return sanitizeProfileToProfileLocal(profileResult as Profile);
@@ -146,6 +170,7 @@ export async function updateUserProfileOnDb({
   locale,
   userAgent,
   screenResolution,
+  avatarImageUrl,
 }: {
   uid: string;
   gender?: string;
@@ -156,6 +181,7 @@ export async function updateUserProfileOnDb({
   locale?: string;
   userAgent?: string;
   screenResolution?: string;
+  avatarImageUrl?: string;
 }): Promise<ProfileLocal | string> {
   // Step 1: Fetch the user profile from the database
   await connectToDatabase();
@@ -203,8 +229,19 @@ export async function updateUserProfileOnDb({
   ) {
     profileResult.screen_resolution = screenResolution;
   }
+  if (
+    avatarImageUrl &&
+    (avatarImageUrl !== "" && avatarImageUrl) !== profileResult
+  ) {
+    profileResult.avatar_image_url = avatarImageUrl;
+  }
+
+  // Check for new achievements unlocked
+  // TODO: Implement achievements
 
   // Step 3: Save the updated profile
+  const sanitizedProfile = sanitizeOnProfileSave(profileResult);
+  profileResult.set(sanitizedProfile);
   const updatedProfileResult = await profileResult.save();
 
   if (updatedProfileResult && typeof updatedProfileResult === "object") {
@@ -218,6 +255,8 @@ export async function updateUserProfileOnDb({
       politicalAffiliation: updatedProfileResult.political_affiliation,
       locale: updatedProfileResult.locale,
       totalScore: updatedProfileResult.total_score,
+      avatarImageUrl: updatedProfileResult.avatar_image_url,
+      achievementsUnlocked: updatedProfileResult.achievements_unlocked,
     };
     return localProfile;
   }
@@ -273,41 +312,43 @@ export async function getGeoLocationInfo(
 }
 
 /**
- * Fetch all avatars from the database.
- * @returns
+ * Update the avatar image URL for the user profile.
+ * @param uid
+ * @param avatarImageUrl
+ * @returns boolean | null: (true if updated, false if not updated, null if error)
  */
-export async function getAllAvatarsFromDb() {
-  await connectToDatabase();
-  const avatarsResult = await AvatarDb.find();
-  if (!avatarsResult) {
+export async function updateProfileAvatarOnDb({
+  uid,
+  avatarImageUrl,
+}: {
+  uid: string;
+  avatarImageUrl: string;
+}): Promise<boolean | null> {
+  try {
+    await connectToDatabase();
+
+    const profileResult = await ProfileDb.findOne({
+      uid: uid,
+    });
+    if (!profileResult) {
+      console.error("Profile not found. Uid: ", uid);
+      return null;
+    }
+
+    profileResult.avatar_image_url = avatarImageUrl;
+    const sanitizedProfile = sanitizeOnProfileSave(profileResult);
+    profileResult.set(sanitizedProfile);
+    const updatedProfileResult = await profileResult.save();
+    if (updatedProfileResult && typeof updatedProfileResult === "object") {
+      return true;
+    } else {
+      console.error("Error updating profile avatar image URL. Uid: ", uid);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating profile avatar image URL. error: ", error);
     return null;
   }
-
-  const images = avatarsResult.map((avatar) => {
-    return {
-      name: avatar.name,
-      data: avatar.data.toString("base64"),
-    };
-  });
-  return images;
-}
-
-/**
- * Fetch a specific avatar from the database.
- * @param avatarId
- * @returns
- */
-export async function getAvatarByIdFromDb(avatarId: string) {
-  await connectToDatabase();
-  const avatarResult = await AvatarDb.findOne({ name: avatarId });
-  if (!avatarResult) {
-    return null;
-  }
-
-  return {
-    name: avatarResult.name,
-    data: avatarResult.data.toString("base64"),
-  };
 }
 
 /**
@@ -318,8 +359,6 @@ export async function getAvatarByIdFromDb(avatarId: string) {
 export async function getUserStatsFromDb(
   userUid: string
 ): Promise<ProfileStatistics | null> {
-  console.error("getUserStatsFromDb not implemented. Uid: ", userUid);
-
   const userStats: ProfileStatistics = {
     totalScore: 0,
     totalQuestionsAnswered: 0,
@@ -400,6 +439,58 @@ export async function getUserStatsFromDb(
  * ////////////////////////////////////////////////
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sanitizeOnProfileSave(profileFromDb: any): any {
+  const profileToSave = profileFromDb;
+
+  // Make sure every field exists
+  if (!profileToSave.username) {
+    profileToSave.username = profileToSave.uid;
+  }
+  if (!profileToSave.gender) {
+    profileToSave.gender = GenderOptions.DeclineToSay;
+  }
+  if (!profileToSave.age_group) {
+    profileToSave.age_group = AgeGroupOptions.DeclineToSay;
+  }
+  if (!profileToSave.education_level) {
+    profileToSave.education_level = EducationLevelOptions.DeclineToSay;
+  }
+  if (!profileToSave.employment_status) {
+    profileToSave.employment_status = EmploymentStatusOptions.DeclineToSay;
+  }
+  if (!profileToSave.political_affiliation) {
+    profileToSave.political_affiliation =
+      PoliticalAffiliationOptions.DeclineToSay;
+  }
+  if (!profileToSave.locale) {
+    profileToSave.locale = "unknown";
+  }
+  if (!profileToSave.user_agent) {
+    profileToSave.user_agent = "unknown";
+  }
+  if (!profileToSave.screen_resolution) {
+    profileToSave.screen_resolution = "unknown";
+  }
+  if (!profileToSave.total_score) {
+    profileToSave.total_score = 0;
+  }
+  if (!profileToSave.served_articles) {
+    profileToSave.served_articles = [];
+  }
+  if (!profileToSave.avatar_image_url) {
+    profileToSave.avatar_image_url = BASIC_AVATAR_URL;
+  }
+  if (!profileToSave.achievements_unlocked) {
+    profileToSave.achievements_unlocked = [];
+  }
+  if (!profileToSave.ip_geo_location) {
+    profileToSave.ip_geo_location = {};
+  }
+
+  return profileToSave;
+}
+
 function sanitizeProfileToProfileLocal(profile: Profile): ProfileLocal {
   const profileLocal: ProfileLocal = {
     uid: profile.uid,
@@ -411,6 +502,8 @@ function sanitizeProfileToProfileLocal(profile: Profile): ProfileLocal {
     politicalAffiliation: profile.politicalAffiliation,
     totalScore: profile.totalScore,
     locale: profile.locale,
+    avatarImageUrl: profile.avatarImageUrl,
+    achievementsUnlocked: profile.achievementsUnlocked,
   };
 
   return profileLocal;
