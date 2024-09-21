@@ -159,6 +159,39 @@ export async function updateProfileOnServer({
 }
 
 /**
+ * Makes a PUT request to update the user profile avatar on the server.
+ * @param uid: string
+ * @param avatarImageUrl: string
+ * @returns boolean
+ */
+export async function updateProfileAvatarOnServer({
+  uid,
+  avatarImageUrl,
+}: {
+  uid: string;
+  avatarImageUrl: string;
+}) {
+  try {
+    const response = await axios.put(
+      `/api/profile/avatar`,
+      {
+        avatarImageUrl,
+      },
+      {
+        params: { uid },
+      }
+    );
+    if (response.status === 200) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
  * Makes a GET request to fetch the user status from the server.
  * @param param0
  * @returns

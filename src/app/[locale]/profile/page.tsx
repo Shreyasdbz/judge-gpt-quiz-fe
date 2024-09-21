@@ -25,18 +25,22 @@ const ProfilePage = () => {
         <SiteLogoText variant="small" includeSecondaryText />
       </div>
       {/* Avatar and Edit */}
-      <div className="flex flex-col items-center justify-center w-full h-full max-w-6xl py-8 lg:items-start">
+      <div className="flex flex-col items-center justify-center w-full h-full max-w-6xl py-8 lg:justify-start lg:flex-row lg:gap-8">
         <div>
           <AvatarUpdateDialog />
         </div>
-        {localProfile && (
-          <p className="flex items-center justify-center gap-1 py-4">
-            <span className="text-lg font-light">Hello</span>
-            <span className="text-xl font-medium">{localProfile.username}</span>
-          </p>
-        )}
-        <div className="flex flex-col items-center justify-start max-w-6xl gap-2">
-          <ProfileUpdateDialog />
+        <div className="flex flex-col">
+          {localProfile && (
+            <p className="flex items-center justify-center gap-1 py-4">
+              <span className="text-lg font-light">Hello</span>
+              <span className="text-xl font-medium">
+                {localProfile.username}
+              </span>
+            </p>
+          )}
+          <div className="flex flex-col items-center justify-start max-w-6xl gap-2">
+            <ProfileUpdateDialog />
+          </div>
         </div>
       </div>
       {/* Stats & Achievements */}

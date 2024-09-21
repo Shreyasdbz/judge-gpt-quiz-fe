@@ -15,6 +15,7 @@ import {
   storeProfileUidInLocalStorage,
   createNewProfileOnServer,
   updateProfileOnServer,
+  updateProfileAvatarOnServer,
   fetchLocalProfile,
 } from "@/lib/profileUtils";
 import {
@@ -28,6 +29,7 @@ interface UserSessionProviderProps {
   quizSession: QuizSession | null;
   createNewProfile: (profileToCreate: Profile) => void;
   updateProfile: (profileToUpdate: Partial<Profile>) => Promise<boolean>;
+  updateAvatar(url: string): Promise<boolean>;
   createNewQuizSession: ({
     newUserUid,
     isPreload,
@@ -106,6 +108,33 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     });
     if (result != null) {
       setLocalProfile(result);
+      setIsLoading(false);
+      return true;
+    } else {
+      setIsLoading(false);
+      return false;
+    }
+  }
+
+  /**
+   * Update the user avatar image URL.
+   * @param url
+   */
+  async function updateAvatar(url: string): Promise<boolean> {
+    setIsLoading(true);
+    if (localProfile == null) {
+      setIsLoading(false);
+      return false;
+    }
+    const result = await updateProfileAvatarOnServer({
+      uid: localProfile.uid,
+      avatarImageUrl: url,
+    });
+    if (result !== null && result === true) {
+      setLocalProfile({
+        ...localProfile,
+        avatarImageUrl: url,
+      });
       setIsLoading(false);
       return true;
     } else {
@@ -240,6 +269,7 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     quizSession,
     createNewProfile,
     updateProfile,
+    updateAvatar,
     createNewQuizSession,
     recordUserResponse,
     incrementCurrentArticleIndex,

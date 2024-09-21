@@ -17,12 +17,26 @@ import {
 import { cn } from "@/lib/utils";
 
 const AvatarUpdateDialog = () => {
-  const { localProfile } = useUserSession();
+  const { localProfile, isLoading, updateAvatar } = useUserSession();
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] =
     useState<string>(BASIC_AVATAR_URL);
 
   function onSelectAvatar(url: string) {
     setSelectedOption(url);
+  }
+
+  async function onSaveAvatar() {
+    const result = await updateAvatar(selectedOption);
+    if (result === true) {
+      setDialogOpen(false);
+    }
+  }
+
+  function handleOnOpenChange(change: boolean) {
+    if (!change) {
+      setDialogOpen(false);
+    }
   }
 
   useEffect(() => {
@@ -36,9 +50,14 @@ const AvatarUpdateDialog = () => {
   }
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={handleOnOpenChange}>
       <DialogTrigger asChild>
-        <button className="relative flex items-center justify-center overflow-hidden rounded-full border-1 group">
+        <button
+          className="relative flex items-center justify-center overflow-hidden rounded-full border-1 group"
+          onClick={() => {
+            setDialogOpen(true);
+          }}
+        >
           <Image
             src={localProfile.avatarImageUrl || BASIC_AVATAR_URL}
             alt="basic-avatar-image"
@@ -62,7 +81,12 @@ const AvatarUpdateDialog = () => {
             <span>Select an avatar from the options below</span>
           </DialogDescription>
         </DialogHeader>
-        <div className="w-full h-full grid grid-cols-2 lg:grid-cols-3  max-h-[50vh] overflow-y-scroll">
+        <div
+          className={cn(
+            "w-full h-full hidden grid-cols-2 lg:grid-cols-3  max-h-[50vh] overflow-y-scroll",
+            { grid: !isLoading }
+          )}
+        >
           {AvatarUrls.map((avatarUrl) => (
             <div
               key={avatarUrl}
@@ -92,8 +116,18 @@ const AvatarUpdateDialog = () => {
             </div>
           ))}
         </div>
+        {isLoading === true && (
+          <div className="flex items-center justify-center w-full h-full">
+            <span className="text-lg font-light">Loading...</span>
+          </div>
+        )}
         <DialogFooter className="flex items-center justify-end w-full py-2">
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full"
+            onClick={onSaveAvatar}
+            disabled={isLoading}
+          >
             <span>Save</span>
           </Button>
         </DialogFooter>

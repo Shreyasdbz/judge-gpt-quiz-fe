@@ -7,7 +7,6 @@ import {
 } from "@/models/Profile";
 import ProfileDb, { IpGeoInfoDb } from "@/models/ProfileDb";
 import ResponseDb from "@/models/ResponseDb";
-import AvatarDb from "@/models/AvatarDb";
 import { connectToDatabase } from "@/lib/db";
 
 /**
@@ -306,41 +305,38 @@ export async function getGeoLocationInfo(
 }
 
 /**
- * Fetch all avatars from the database.
- * @returns
+ * Update the avatar image URL for the user profile.
+ * @param uid
+ * @param avatarImageUrl
+ * @returns boolean | null: (true if updated, false if not updated, null if error)
  */
-export async function getAllAvatarsFromDb() {
-  await connectToDatabase();
-  const avatarsResult = await AvatarDb.find();
-  if (!avatarsResult) {
+export async function updateProfileAvatarOnDb({
+  uid,
+  avatarImageUrl,
+}: {
+  uid: string;
+  avatarImageUrl: string;
+}): Promise<boolean | null> {
+  try {
+    await connectToDatabase();
+
+    const profileResult = await ProfileDb.findOne({
+      uid: uid,
+    });
+    if (!profileResult) {
+      return null;
+    }
+
+    profileResult.avatar_image_url = avatarImageUrl;
+    const updatedProfileResult = await profileResult.save();
+    if (updatedProfileResult && typeof updatedProfileResult === "object") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
     return null;
   }
-
-  const images = avatarsResult.map((avatar) => {
-    return {
-      name: avatar.name,
-      data: avatar.data.toString("base64"),
-    };
-  });
-  return images;
-}
-
-/**
- * Fetch a specific avatar from the database.
- * @param avatarId
- * @returns
- */
-export async function getAvatarByIdFromDb(avatarId: string) {
-  await connectToDatabase();
-  const avatarResult = await AvatarDb.findOne({ name: avatarId });
-  if (!avatarResult) {
-    return null;
-  }
-
-  return {
-    name: avatarResult.name,
-    data: avatarResult.data.toString("base64"),
-  };
 }
 
 /**
