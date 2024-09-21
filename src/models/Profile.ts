@@ -53,12 +53,30 @@ export interface AvatarImage {
   data: Blob;
 }
 
-export interface UserStats {
+export interface ProfileStatistics {
   totalScore: number;
   totalQuestionsAnswered: number;
   percentCorrect: number;
   percentRespondedIsHuman: number;
   percentRespondedIsFake: number;
+  averageTimeToRespond: number;
+  // TODO: Add more statistics
+  // - Time of the day most active
+  // - Day of the week most active
+}
+
+export enum ProfileAchievements {
+  FirstSteps = "FirstSteps", // Read first article
+  Novice = "Novice", // Read 15 articles
+  Apprentice = "Apprentice", // Read 30 articles
+  Expert = "Expert", // Read 50 articles
+  Master = "Master", // Read 100 articles
+  SpotTheFake = "SpotTheFake", // Spotted first fake article correctly
+  TruthSeeker = "TruthSeeker", // Spotted first real article correctly
+  InTheZone = "InTheZone", // Guessed 5 articles in a row correctly
+  HotStreak = "HotStreak", // Guessed 10 articles in a row correctly
+  MultiLingual = "MultiLingual", // Guessed on articles in 2 languages
+  DefenderOfDemocracy = "DefenderOfDemocracy", // Guessed on International Democracy Day
 }
 
 /**
@@ -91,6 +109,8 @@ export interface Profile {
   screenResolution: string;
   totalScore: number;
   servedArticles: string[];
+  // TODO: Add:
+  // achievementsUnlocked: ProfileAchievements[];
 }
 
 /**

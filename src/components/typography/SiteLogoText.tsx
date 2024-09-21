@@ -19,9 +19,9 @@ const SiteLogoText = ({
       <div
         className={cn(
           outfit.className,
-          "px-1 flex flex-col md:flex-row md:gap-2 leading-tight tracking-tighter lg:text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-black dark:from-white via-red-950 dark:via-red-100 to-green-900 dark:to-green-100",
+          "flex flex-col md:flex-row md:gap-2 leading-tight tracking-tighter lg:text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-black dark:from-white via-red-950 dark:via-red-100 to-green-900 dark:to-green-100",
           variant === "small" && "text-2xl lg:text-left",
-          variant === "large" && "text-8xl",
+          variant === "large" && "px-1 text-8xl",
           variant === "small" && "flex-row w-full"
         )}
       >

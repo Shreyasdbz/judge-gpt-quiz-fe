@@ -1,6 +1,7 @@
 import axios from "axios";
-import { Profile, ProfileLocal } from "@/models/Profile";
+import { Profile, ProfileLocal, ProfileStatistics } from "@/models/Profile";
 import ProfileDb, { IpGeoInfoDb } from "@/models/ProfileDb";
+import ResponseDb from "@/models/ResponseDb";
 import AvatarDb from "@/models/AvatarDb";
 import { connectToDatabase } from "@/lib/db";
 
@@ -307,6 +308,90 @@ export async function getAvatarByIdFromDb(avatarId: string) {
     name: avatarResult.name,
     data: avatarResult.data.toString("base64"),
   };
+}
+
+/**
+ * Aggregate the user's statistics from the database.
+ * @param userUid
+ * @returns
+ */
+export async function getUserStatsFromDb(
+  userUid: string
+): Promise<ProfileStatistics | null> {
+  console.error("getUserStatsFromDb not implemented. Uid: ", userUid);
+
+  const userStats: ProfileStatistics = {
+    totalScore: 0,
+    totalQuestionsAnswered: 0,
+    percentCorrect: 0,
+    percentRespondedIsHuman: 0,
+    percentRespondedIsFake: 0,
+    averageTimeToRespond: 0,
+  };
+
+  // Get profile from database
+  await connectToDatabase();
+  const profileResult = await ProfileDb.findOne({ uid: userUid });
+  if (!profileResult) {
+    return null;
+  }
+
+  // Total score
+  userStats.totalScore = profileResult.total_score;
+
+  // Total questions answered
+  // - Get all responses from the database for the user
+  const allUserResponsesResult = await ResponseDb.find({
+    user_uid: { $eq: userUid },
+  });
+  if (!allUserResponsesResult) {
+    return null;
+  }
+  userStats.totalQuestionsAnswered = allUserResponsesResult.length;
+
+  // Percent of questions answered correctly
+  // - Calculate the percentage of correct responses (total_score / length of responses)
+  // - zero division check
+  if (userStats.totalQuestionsAnswered > 0) {
+    userStats.percentCorrect =
+      (userStats.totalScore / userStats.totalQuestionsAnswered) * 100;
+  }
+
+  // Percent of times selected human-authored for article
+  if (userStats.totalQuestionsAnswered > 0) {
+    const totalHumanResponses = allUserResponsesResult.filter(
+      (response) => response.user_responded_is_human === 0
+    ).length;
+    if (totalHumanResponses > 0) {
+      userStats.percentRespondedIsHuman =
+        (totalHumanResponses / userStats.totalQuestionsAnswered) * 100;
+    }
+  }
+
+  // Percent of times selected fake for article
+  if (userStats.totalQuestionsAnswered > 0) {
+    const totalFakeResponses = allUserResponsesResult.filter(
+      (response) => response.user_responded_is_fake === 1
+    ).length;
+    if (totalFakeResponses > 0) {
+      userStats.percentRespondedIsFake =
+        (totalFakeResponses / userStats.totalQuestionsAnswered) * 100;
+    }
+  }
+
+  // Average time to respond
+  // - Calculate the average time to respond for all responses
+  // - zero division check
+  if (userStats.totalQuestionsAnswered > 0) {
+    const totalResponseTime = allUserResponsesResult.reduce(
+      (acc, response) => acc + response.time_to_respond,
+      0
+    );
+    userStats.averageTimeToRespond =
+      totalResponseTime / (userStats.totalQuestionsAnswered * 1000);
+  }
+
+  return userStats;
 }
 
 /**

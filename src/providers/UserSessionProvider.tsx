@@ -135,7 +135,10 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
       router.push("/quiz");
       return;
     }
-    const localUid = newUserUid || (await fetchProfileUidFromLocalStorage());
+    const localUid =
+      newUserUid ||
+      localProfile?.uid ||
+      (await fetchProfileUidFromLocalStorage());
     // Make sure user profile & localUid is available
     if (localProfile == null || localUid == null) {
       setIsLoading(false);
@@ -182,7 +185,8 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
       return null;
     }
 
-    const localUid = await fetchProfileUidFromLocalStorage();
+    const localUid =
+      localProfile.uid || (await fetchProfileUidFromLocalStorage());
     if (localUid == null) {
       return null;
     }

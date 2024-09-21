@@ -2,6 +2,7 @@ import {
   LOCAL_STORAGE_KEY_PROFILE,
   Profile,
   ProfileLocal,
+  ProfileStatistics,
 } from "@/models/Profile";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
@@ -149,6 +150,28 @@ export async function updateProfileOnServer({
     if (response.status === 200) {
       const updatedLocalProfile = response.data as ProfileLocal;
       return updatedLocalProfile;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Makes a GET request to fetch the user status from the server.
+ * @param param0
+ * @returns
+ */
+export async function getUserStatusFromServer({
+  uid,
+}: {
+  uid: string;
+}): Promise<ProfileStatistics | null> {
+  try {
+    const response = await axios.get(`/api/profile/stats?uid=${uid}`);
+    if (response.status === 200) {
+      return response.data.statsResult as ProfileStatistics;
     } else {
       return null;
     }

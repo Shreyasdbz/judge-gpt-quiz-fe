@@ -3,6 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getUserStatsFromDb } from "../profile.utils";
 
 /**
  * Retrieves a set of user stats.
@@ -10,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
  * - query: { uid: string }
  * @param req: NextResponse
  * - status: 200 | 400 | 500
- * - body: { stats: Stats }
+ * - body: { ProfileStatistics }
  */
 export async function GET(req: NextRequest) {
   // Get the uid from query parameters
@@ -25,9 +26,14 @@ export async function GET(req: NextRequest) {
   if (!uid) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
-  // Method not implemented
-  return NextResponse.json(
-    { error: "Method not implemented" },
-    { status: 501 }
-  );
+
+  const statsResult = await getUserStatsFromDb(uid);
+  if (!statsResult) {
+    return NextResponse.json(
+      { error: "Failed to retrieve stats" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ statsResult }, { status: 200 });
 }

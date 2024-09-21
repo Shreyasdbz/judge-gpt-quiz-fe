@@ -10,30 +10,33 @@ const ProfilePage = () => {
   const { localProfile } = useUserSession();
 
   return (
-    <div className="w-full h-full flex items-center justify-center flex-col px-2 py-4">
+    <div className="w-full h-full flex items-center justify-center flex-col px-4 lg:px-8 py-4">
       <div className="w-full max-w-6xl">
         <SiteLogoText variant="small" includeSecondaryText />
       </div>
-      <div className="w-full h-full max-w-6xl flex flex-col items-center justify-center py-4">
-        {/* Avatar and Edit */}
+      {/* Avatar and Edit */}
+      <div className="w-full h-full max-w-6xl flex flex-col items-center lg:items-start justify-center py-4">
         {localProfile && (
-          <p className="w-full flex items-center justify-center gap-1 py-4">
-            <span className="font-light">Hello</span>
-            <span className="font-medium">{localProfile.username}</span>
+          <p className="flex items-center justify-center gap-1 py-4">
+            <span className="font-light text-lg">Hello</span>
+            <span className="font-medium text-xl">{localProfile.username}</span>
           </p>
         )}
-        <div className="w-full items-center justify-center flex flex-col gap-2">
+        <div className="items-center justify-start flex flex-col gap-2 max-w-6xl">
           <ProfileUpdateDialog />
         </div>
+      </div>
+      {/* Stats & Achievements */}
+      <div className="w-full flex flex-col items-center justify-center max-w-6xl">
         {/* Your stats */}
-        <div className="w-full items-center justify-center flex flex-col py-4">
+        <div className="w-full items-center justify-center flex flex-col">
           <span className="w-full text-left text-lg font-semibold py-2">
             Your statistics
           </span>
           <UserStatistics />
         </div>
         {/* Your achievements */}
-        <div className="w-full items-center justify-center flex flex-col py-4">
+        <div className="w-full items-center justify-center flex flex-col py-4 max-w-6xl">
           <span className="w-full text-left text-lg font-semibold">
             Your achievements
           </span>
