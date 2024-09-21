@@ -42,6 +42,8 @@ export async function createQuizSessionOnServer(
  * @param localeRespondedIn: string
  * @param articleIndex: number
  * @returns
+ * - { correct: boolean, detail: string } if the user response is correct
+ * - false if there is an error
  */
 export async function recordUserResponseOnServer({
   userUid,
@@ -59,7 +61,7 @@ export async function recordUserResponseOnServer({
   timeToRespond: number;
   localeRespondedIn: string;
   articleIndex: number;
-}) {
+}): Promise<{ correct: boolean; detail: string } | null> {
   const response = await axios.post(
     "/api/quiz",
     {
@@ -78,8 +80,12 @@ export async function recordUserResponseOnServer({
   );
 
   if (response.status != 200) {
-    return false;
+    return null;
   }
 
-  return response.data.isCorrect;
+  const result = response.data;
+  return {
+    correct: result.correct,
+    detail: result.detail,
+  };
 }

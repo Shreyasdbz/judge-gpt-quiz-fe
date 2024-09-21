@@ -49,7 +49,7 @@ interface UserSessionProviderProps {
     humanOptionSelected: boolean;
     isFakeSelected: boolean;
     timeToRespond: number;
-  }) => Promise<boolean | null>;
+  }) => Promise<{ correct: boolean; detail: string } | null>;
   incrementCurrentArticleIndex: () => void;
 }
 
@@ -206,7 +206,10 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
     humanOptionSelected: boolean;
     isFakeSelected: boolean;
     timeToRespond: number;
-  }): Promise<boolean | null> {
+  }): Promise<{
+    correct: boolean;
+    detail: string;
+  } | null> {
     if (localProfile == null) {
       return null;
     }
@@ -256,11 +259,11 @@ export const UserSessionProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   /**
-   * End the quiz session and navigate to the scores page.
+   * End the quiz session and navigate to the profile.
    */
   async function endQuizSession() {
     setQuizSession(null);
-    router.push("/scores");
+    router.push("/profile");
   }
 
   const value: UserSessionProviderProps = {

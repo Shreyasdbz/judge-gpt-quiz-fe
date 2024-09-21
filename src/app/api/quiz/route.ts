@@ -82,7 +82,7 @@ async function GET(req: NextRequest) {
  *         }
  * @returns
  * - status: 200 | 400 | 404 | 500
- * - body: { isCorrect: boolean } | { error: string }
+ * - body: { correct: boolean, detail: string } | { error: string }
  */
 async function POST(req: NextRequest) {
   try {
@@ -161,7 +161,7 @@ async function POST(req: NextRequest) {
     }
 
     // Store the user's response in the database
-    const isCorrect = await storeUserResponseOnDb({
+    const storeResult = await storeUserResponseOnDb({
       userUid,
       articleUid,
       userRespondedIsHuman,
@@ -170,7 +170,7 @@ async function POST(req: NextRequest) {
       localeRespondedIn,
       articleIndex,
     });
-    if (typeof isCorrect !== "boolean") {
+    if (typeof storeResult === "string") {
       return NextResponse.json(
         { error: "User response not stored" },
         { status: 404 }
@@ -178,7 +178,10 @@ async function POST(req: NextRequest) {
     }
 
     // Success
-    return NextResponse.json({ isCorrect }, { status: 200 });
+    return NextResponse.json(
+      { correct: storeResult.correct, detail: storeResult.detail },
+      { status: 200 }
+    );
 
     // Error handling
   } catch (error) {

@@ -19,6 +19,9 @@ const QuizSessionContainer = () => {
     useUserSession();
   const quizTranslations = useTranslations("Quiz");
   const [userResult, setUserResult] = useState<boolean | null>(null);
+  // TODO: Add details after translations work better
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userResultDetail, setUserResultDetail] = useState<string | null>(null);
   const [humanAiOptionChecked, setHumanAiOptionChecked] = useState<
     "human" | "ai" | null
   >(null);
@@ -53,11 +56,13 @@ const QuizSessionContainer = () => {
       return;
     }
     setIsSubmitting(false);
-    setUserResult(response);
+    setUserResult(response.correct);
+    setUserResultDetail(response.detail);
   }
 
   async function onUserResultClose() {
     setUserResult(null);
+    setUserResultDetail(null);
     incrementCurrentArticleIndex();
     // Reset input states
     setHumanAiOptionChecked(null);
@@ -88,8 +93,8 @@ const QuizSessionContainer = () => {
 
   if (quizSession.articles.length === 0) {
     return (
-      <div className="w-full h-full items-center justify-center flex">
-        <div className="w-full flex items-center justify-center">
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="flex items-center justify-center w-full">
           <h1>TODO: No articles found. Implement this</h1>
         </div>
       </div>
@@ -97,7 +102,7 @@ const QuizSessionContainer = () => {
   }
 
   return (
-    <div className="w-full h-full items-center justify-center flex">
+    <div className="flex items-center justify-center w-full h-full">
       <QuizView
         quizSession={quizSession}
         onSubmitCallback={onSubmit}
@@ -123,12 +128,12 @@ const QuizSessionContainer = () => {
       <AlertDialog open={userResult !== null}>
         <AlertDialogContent onEscapeKeyDown={onUserResultClose}>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex w-full items-center justify-center">
+            <AlertDialogTitle className="flex items-center justify-center w-full">
               {userResult === null
                 ? quizTranslations("quizViewSubmitProcessing")
                 : getRandomFeedback(userResult)}
             </AlertDialogTitle>
-            <AlertDialogDescription className="w-full justify-center flex items-center">
+            <AlertDialogDescription className="flex flex-col items-center justify-center w-full gap-4 py-4">
               {userResult === null && (
                 <span>
                   {quizTranslations("quizViewSubmitProcessingSubtitle")}
@@ -146,23 +151,34 @@ const QuizSessionContainer = () => {
                   size={24}
                 />
               )}
+              {/* TODO: Add details after translations work better */}
+              {/* {userResultDetail !== null && userResultDetail !== "" && (
+                <p className="flex flex-col items-center justify-center w-full">
+                  <span className="w-full font-medium text-center">
+                    Details
+                  </span>
+                  <span className="w-full font-light text-center">
+                    {userResultDetail}
+                  </span>
+                </p>
+              )} */}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction
-              className="w-full flex items-center justify-center"
+              className="flex items-center justify-center w-full"
               onClick={() => {
                 onUserResultClose();
               }}
             >
               {quizSession.currentArticleIndex + 1 <
               quizSession.articles.length ? (
-                <span className="w-full flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center w-full gap-2">
                   {quizTranslations("quizViewSubmitNextButton")}
                   <ArrowRight size={18} />
                 </span>
               ) : (
-                <span className="w-full flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center w-full gap-2">
                   {quizTranslations("quizViewSubmitViewScoresButton")}
                   <ChartSpline size={18} />
                 </span>

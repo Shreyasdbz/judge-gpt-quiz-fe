@@ -1,6 +1,11 @@
 import axios from "axios";
 import {
+  AgeGroupOptions,
   BASIC_AVATAR_URL,
+  EducationLevelOptions,
+  EmploymentStatusOptions,
+  GenderOptions,
+  PoliticalAffiliationOptions,
   Profile,
   ProfileLocal,
   ProfileStatistics,
@@ -235,6 +240,8 @@ export async function updateUserProfileOnDb({
   // TODO: Implement achievements
 
   // Step 3: Save the updated profile
+  const sanitizedProfile = sanitizeOnProfileSave(profileResult);
+  profileResult.set(sanitizedProfile);
   const updatedProfileResult = await profileResult.save();
 
   if (updatedProfileResult && typeof updatedProfileResult === "object") {
@@ -324,17 +331,22 @@ export async function updateProfileAvatarOnDb({
       uid: uid,
     });
     if (!profileResult) {
+      console.error("Profile not found. Uid: ", uid);
       return null;
     }
 
     profileResult.avatar_image_url = avatarImageUrl;
+    const sanitizedProfile = sanitizeOnProfileSave(profileResult);
+    profileResult.set(sanitizedProfile);
     const updatedProfileResult = await profileResult.save();
     if (updatedProfileResult && typeof updatedProfileResult === "object") {
       return true;
     } else {
+      console.error("Error updating profile avatar image URL. Uid: ", uid);
       return false;
     }
   } catch (error) {
+    console.error("Error updating profile avatar image URL. error: ", error);
     return null;
   }
 }
@@ -347,8 +359,6 @@ export async function updateProfileAvatarOnDb({
 export async function getUserStatsFromDb(
   userUid: string
 ): Promise<ProfileStatistics | null> {
-  console.error("getUserStatsFromDb not implemented. Uid: ", userUid);
-
   const userStats: ProfileStatistics = {
     totalScore: 0,
     totalQuestionsAnswered: 0,
@@ -428,6 +438,58 @@ export async function getUserStatsFromDb(
  * Internal functions
  * ////////////////////////////////////////////////
  */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sanitizeOnProfileSave(profileFromDb: any): any {
+  const profileToSave = profileFromDb;
+
+  // Make sure every field exists
+  if (!profileToSave.username) {
+    profileToSave.username = profileToSave.uid;
+  }
+  if (!profileToSave.gender) {
+    profileToSave.gender = GenderOptions.DeclineToSay;
+  }
+  if (!profileToSave.age_group) {
+    profileToSave.age_group = AgeGroupOptions.DeclineToSay;
+  }
+  if (!profileToSave.education_level) {
+    profileToSave.education_level = EducationLevelOptions.DeclineToSay;
+  }
+  if (!profileToSave.employment_status) {
+    profileToSave.employment_status = EmploymentStatusOptions.DeclineToSay;
+  }
+  if (!profileToSave.political_affiliation) {
+    profileToSave.political_affiliation =
+      PoliticalAffiliationOptions.DeclineToSay;
+  }
+  if (!profileToSave.locale) {
+    profileToSave.locale = "unknown";
+  }
+  if (!profileToSave.user_agent) {
+    profileToSave.user_agent = "unknown";
+  }
+  if (!profileToSave.screen_resolution) {
+    profileToSave.screen_resolution = "unknown";
+  }
+  if (!profileToSave.total_score) {
+    profileToSave.total_score = 0;
+  }
+  if (!profileToSave.served_articles) {
+    profileToSave.served_articles = [];
+  }
+  if (!profileToSave.avatar_image_url) {
+    profileToSave.avatar_image_url = BASIC_AVATAR_URL;
+  }
+  if (!profileToSave.achievements_unlocked) {
+    profileToSave.achievements_unlocked = [];
+  }
+  if (!profileToSave.ip_geo_location) {
+    profileToSave.ip_geo_location = {};
+  }
+
+  return profileToSave;
+}
 
 function sanitizeProfileToProfileLocal(profile: Profile): ProfileLocal {
   const profileLocal: ProfileLocal = {
