@@ -1,10 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "next/navigation";
+import { Pencil } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { ProfileFormSchema } from "@/models/Profile";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,17 +16,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ArrowRight } from "lucide-react";
-import { Form } from "@/components/ui/form";
-import { ProfileFormSchema } from "@/models/Profile";
-import ProfileSetupForm from "./ProfileSetupForm";
 import { useUserSession } from "@/providers/UserSessionProvider";
-import { generateRandomUid } from "@/lib/profileUtils";
+import { Form } from "@/components/ui/form";
 
-const ProfileSetupDialog = () => {
+const ProfileUpdateDialog = () => {
   const params = useParams();
-  const t = useTranslations("HomePage");
-  const { createNewProfile, localProfile, isLoading } = useUserSession();
+  const { isLoading, localProfile } = useUserSession();
 
   const form = useForm<z.infer<typeof ProfileFormSchema>>({
     resolver: zodResolver(ProfileFormSchema),
@@ -43,26 +39,16 @@ const ProfileSetupDialog = () => {
 
   function onSubmit(values: z.infer<typeof ProfileFormSchema>) {
     let userLocale = params.locale as string;
+
+    console.log("values: ", values);
+
     if (userLocale.length === 0) {
       userLocale = "en";
     }
-    if (!localProfile) {
+    if (localProfile) {
+      // Update the profile
+    } else {
       // Create a new profile
-      createNewProfile({
-        uid: generateRandomUid(),
-        createdAt: new Date(),
-        username: values.username,
-        gender: values.gender,
-        ageGroup: values.age,
-        educationLevel: values.educationLevel,
-        employmentStatus: values.employmentStatus,
-        politicalAffiliation: values.politicalAffiliation,
-        locale: userLocale,
-        userAgent: navigator.userAgent,
-        screenResolution: `${window.screen.width}x${window.screen.height}`,
-        totalScore: 0,
-        servedArticles: [],
-      });
     }
   }
 
@@ -71,12 +57,11 @@ const ProfileSetupDialog = () => {
       <DialogTrigger asChild>
         <Button
           disabled={isLoading}
-          variant={"default"}
-          size={"lg"}
-          className="w-full font-medium px-10 py-5 gap-2"
+          variant={"outline"}
+          className="font-medium gap-2"
         >
-          {t("takeTheQuizButton")}
-          <ArrowRight size={20} />
+          <Pencil size={16} />
+          <span>Edit Profile</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -86,15 +71,17 @@ const ProfileSetupDialog = () => {
             className="flex flex-col w-full items-center justify-center gap-2"
           >
             <DialogHeader className="w-full">
-              <DialogTitle>{t("newProfileDialogTitle")}</DialogTitle>
+              <DialogTitle>
+                <span>Update profile</span>
+              </DialogTitle>
               <DialogDescription>
-                {t("newProfileDialogDescription")}
+                <span>Update</span>
               </DialogDescription>
             </DialogHeader>
-            <ProfileSetupForm form={form} />
+            {/* <ProfileSetupForm form={form} /> */}
             <DialogFooter className="w-full flex items-center justify-end py-2">
               <Button type="submit" className="w-full">
-                {t("getSpottingButton")}
+                <span>Save</span>
               </Button>
             </DialogFooter>
           </form>
@@ -104,4 +91,4 @@ const ProfileSetupDialog = () => {
   );
 };
 
-export default ProfileSetupDialog;
+export default ProfileUpdateDialog;

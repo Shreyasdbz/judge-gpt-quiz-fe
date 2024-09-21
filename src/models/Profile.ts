@@ -48,6 +48,19 @@ export enum PoliticalAffiliationOptions {
   DeclineToSay = "DeclineToSay",
 }
 
+export interface AvatarImage {
+  name: string;
+  data: Blob;
+}
+
+export interface UserStats {
+  totalScore: number;
+  totalQuestionsAnswered: number;
+  percentCorrect: number;
+  percentRespondedIsHuman: number;
+  percentRespondedIsFake: number;
+}
+
 /**
  * Primary profile object
  * @param uid - User ID

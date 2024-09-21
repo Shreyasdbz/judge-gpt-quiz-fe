@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Outfit } from "next/font/google";
 import { useTranslations } from "next-intl";
+import { Separator } from "@/components/ui/separator";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -33,6 +34,9 @@ const SiteLogoText = ({
         <span className="w-full text-left font-light text-muted-foreground text-sm">
           {t("siteTextSubtitle")}
         </span>
+      )}
+      {variant === "small" && (
+        <Separator orientation="horizontal" className="w-full" />
       )}
     </div>
   );

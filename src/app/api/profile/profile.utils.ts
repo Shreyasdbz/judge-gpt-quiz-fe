@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Profile, ProfileLocal } from "@/models/Profile";
 import ProfileDb, { IpGeoInfoDb } from "@/models/ProfileDb";
+import AvatarDb from "@/models/AvatarDb";
 import { connectToDatabase } from "@/lib/db";
 
 /**
@@ -134,6 +135,95 @@ export async function createNewUserProfileOnDb({
   }
 }
 
+export async function updateUserProfileOnDb({
+  uid,
+  gender,
+  ageGroup,
+  educationLevel,
+  employmentStatus,
+  politicalAffiliation,
+  locale,
+  userAgent,
+  screenResolution,
+}: {
+  uid: string;
+  gender?: string;
+  ageGroup?: string;
+  educationLevel?: string;
+  employmentStatus?: string;
+  politicalAffiliation?: string;
+  locale?: string;
+  userAgent?: string;
+  screenResolution?: string;
+}): Promise<ProfileLocal | string> {
+  // Step 1: Fetch the user profile from the database
+  await connectToDatabase();
+  const profileResult = await ProfileDb.findOne({
+    uid: uid,
+  });
+  if (!profileResult) {
+    return "User not found";
+  }
+
+  // Step 2: Update the user profile
+  if (gender && gender != "" && gender != profileResult) {
+    profileResult.gender = gender;
+  }
+  if (ageGroup && (ageGroup !== "" && ageGroup) !== profileResult) {
+    profileResult.age_group = ageGroup;
+  }
+  if (
+    educationLevel &&
+    (educationLevel !== "" && educationLevel) !== profileResult
+  ) {
+    profileResult.education_level = educationLevel;
+  }
+  if (
+    employmentStatus &&
+    (employmentStatus !== "" && employmentStatus) !== profileResult
+  ) {
+    profileResult.employment_status = employmentStatus;
+  }
+  if (
+    politicalAffiliation &&
+    (politicalAffiliation !== "" && politicalAffiliation) !== profileResult
+  ) {
+    profileResult.political_affiliation = politicalAffiliation;
+  }
+  if (locale && (locale !== "" && locale) !== profileResult) {
+    profileResult.locale = locale;
+  }
+  if (userAgent && (userAgent !== "" && userAgent) !== profileResult) {
+    profileResult.user_agent = userAgent;
+  }
+  if (
+    screenResolution &&
+    (screenResolution !== "" && screenResolution) !== profileResult
+  ) {
+    profileResult.screen_resolution = screenResolution;
+  }
+
+  // Step 3: Save the updated profile
+  const updatedProfileResult = await profileResult.save();
+
+  if (updatedProfileResult && typeof updatedProfileResult === "object") {
+    const localProfile: ProfileLocal = {
+      uid: updatedProfileResult.uid,
+      username: updatedProfileResult.username,
+      gender: updatedProfileResult.gender,
+      ageGroup: updatedProfileResult.age_group,
+      educationLevel: updatedProfileResult.education_level,
+      employmentStatus: updatedProfileResult.employment_status,
+      politicalAffiliation: updatedProfileResult.political_affiliation,
+      locale: updatedProfileResult.locale,
+      totalScore: updatedProfileResult.total_score,
+    };
+    return localProfile;
+  }
+
+  return "error";
+}
+
 export async function getGeoLocationInfo(
   originIpAddr: string
 ): Promise<IpGeoInfoDb | null> {
@@ -179,6 +269,44 @@ export async function getGeoLocationInfo(
     return returnValue;
   }
   return null;
+}
+
+/**
+ * Fetch all avatars from the database.
+ * @returns
+ */
+export async function getAllAvatarsFromDb() {
+  await connectToDatabase();
+  const avatarsResult = await AvatarDb.find();
+  if (!avatarsResult) {
+    return null;
+  }
+
+  const images = avatarsResult.map((avatar) => {
+    return {
+      name: avatar.name,
+      data: avatar.data.toString("base64"),
+    };
+  });
+  return images;
+}
+
+/**
+ * Fetch a specific avatar from the database.
+ * @param avatarId
+ * @returns
+ */
+export async function getAvatarByIdFromDb(avatarId: string) {
+  await connectToDatabase();
+  const avatarResult = await AvatarDb.findOne({ name: avatarId });
+  if (!avatarResult) {
+    return null;
+  }
+
+  return {
+    name: avatarResult.name,
+    data: avatarResult.data.toString("base64"),
+  };
 }
 
 /**

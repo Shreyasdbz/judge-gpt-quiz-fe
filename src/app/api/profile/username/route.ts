@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isUsernameAvailableOnDb } from "../profile/profile.utils";
+import { isUsernameAvailableOnDb } from "../profile.utils";
 
 /**
- * [GET] /api/username
+ * [GET] /api/profile/username
  * Checks if the username is available.
  * @param req: NextRequest
  * - query: { username: string }

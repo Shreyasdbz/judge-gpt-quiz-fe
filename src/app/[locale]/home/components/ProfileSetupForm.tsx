@@ -196,6 +196,9 @@ const ProfileSetupForm = ({
                 <SelectItem value={AgeGroupOptions.Above54}>
                   {translations("newProfileAgeOptionAbove55")}
                 </SelectItem>
+                <SelectItem value={AgeGroupOptions.DeclineToSay}>
+                  {translations("newProfileGenderOptionPreferNotToSay")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </FormItem>
@@ -245,6 +248,9 @@ const ProfileSetupForm = ({
                 <SelectItem value={EducationLevelOptions.Other}>
                   {translations("newProfileEducationLevelOptionOther")}
                 </SelectItem>
+                <SelectItem value={EducationLevelOptions.DeclineToSay}>
+                  {translations("newProfileGenderOptionPreferNotToSay")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </FormItem>
@@ -285,6 +291,9 @@ const ProfileSetupForm = ({
                 </SelectItem>
                 <SelectItem value={EmploymentStatusOptions.Other}>
                   {translations("newProfileEmploymentStatusOptionOther")}
+                </SelectItem>
+                <SelectItem value={EmploymentStatusOptions.DeclineToSay}>
+                  {translations("newProfileGenderOptionPreferNotToSay")}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -338,6 +347,9 @@ const ProfileSetupForm = ({
                   {translations(
                     "newProfilePoliticalAffiliationOptionVeryProgressive"
                   )}
+                </SelectItem>
+                <SelectItem value={PoliticalAffiliationOptions.DeclineToSay}>
+                  {translations("newProfileGenderOptionPreferNotToSay")}
                 </SelectItem>
               </SelectContent>
             </Select>
