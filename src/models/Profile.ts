@@ -2,6 +2,9 @@ import { z } from "zod";
 
 export const LOCAL_STORAGE_KEY_PROFILE = "judgegpt_app_profile_uid";
 
+export const BASIC_AVATAR_URL =
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/basic-avatar.jpeg";
+
 export enum GenderOptions {
   Male = "Male",
   Female = "Female",
@@ -109,8 +112,8 @@ export interface Profile {
   screenResolution: string;
   totalScore: number;
   servedArticles: string[];
-  // TODO: Add:
-  // achievementsUnlocked: ProfileAchievements[];
+  avatarImageUrl: string;
+  achievementsUnlocked: string[];
 }
 
 /**

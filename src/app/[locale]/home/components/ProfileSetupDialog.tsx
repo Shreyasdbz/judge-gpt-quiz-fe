@@ -62,6 +62,8 @@ const ProfileSetupDialog = () => {
         screenResolution: `${window.screen.width}x${window.screen.height}`,
         totalScore: 0,
         servedArticles: [],
+        achievementsUnlocked: [],
+        avatarImageUrl: "",
       });
     }
   }

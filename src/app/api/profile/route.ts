@@ -5,7 +5,7 @@ import {
   updateUserProfileOnDb,
   getGeoLocationInfo,
 } from "./profile.utils";
-import { Profile } from "@/models/Profile";
+import { BASIC_AVATAR_URL, Profile } from "@/models/Profile";
 import { IpGeoInfoDb } from "@/models/ProfileDb";
 
 /**
@@ -161,6 +161,8 @@ async function POST(req: NextRequest) {
       screenResolution,
       totalScore: 0,
       servedArticles: [],
+      achievementsUnlocked: [],
+      avatarImageUrl: BASIC_AVATAR_URL,
     };
     const result = await createNewUserProfileOnDb({ newProfile, ipGeoInfo });
     if (typeof result === "string") {
@@ -191,8 +193,9 @@ async function POST(req: NextRequest) {
  *    employmentStatus?: string,
  *    politicalAffiliation?: string,
  *    locale?: string,
- *     userAgent?: string,
+ *    userAgent?: string,
  *    screenResolution?: string,
+ *    avatarImageUrl?: string,
  *  }
  * @param res: NextResponse
  * - status: 200 | 400 | 500
@@ -228,6 +231,7 @@ async function PUT(req: NextRequest) {
     locale,
     userAgent,
     screenResolution,
+    avatarImageUrl,
   } = data;
 
   const updateResult = await updateUserProfileOnDb({
@@ -240,6 +244,7 @@ async function PUT(req: NextRequest) {
     locale,
     userAgent,
     screenResolution,
+    avatarImageUrl,
   });
 
   if (typeof updateResult === "string") {
