@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowRight } from "lucide-react";
 import { Form } from "@/components/ui/form";
-import { ProfileFormSchema } from "@/models/Profile";
+import { BASIC_AVATAR_URL, ProfileFormSchema } from "@/models/Profile";
 import ProfileSetupForm from "./ProfileSetupForm";
 import { useUserSession } from "@/providers/UserSessionProvider";
 import { generateRandomUid } from "@/lib/profileUtils";
@@ -63,7 +63,7 @@ const ProfileSetupDialog = () => {
         totalScore: 0,
         servedArticles: [],
         achievementsUnlocked: [],
-        avatarImageUrl: "",
+        avatarImageUrl: BASIC_AVATAR_URL,
       });
     }
   }

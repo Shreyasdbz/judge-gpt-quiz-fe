@@ -98,47 +98,47 @@ const QuizView = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center py-2 gap-2">
+    <div className="flex flex-col items-center justify-center w-full h-full gap-2 py-2">
       {/* Article Section */}
       <div className="flex flex-col items-center justify-start w-full h-full">
         {/* Article headline */}
-        <span className="w-full text-left text-xl font-medium pb-1">
+        <span className="w-full pb-1 text-xl font-medium text-left">
           {getArticleHeadline()}
         </span>
         {/* Article content */}
-        <div className="bg-muted/50 w-full border border-muted-foreground/20 px-2 md:px-4 py-2 overflow-y-scroll h-full  max-h-[40vh] md:max-h-[55vh] rounded-cmd">
-          <blockquote className="text-primary/80 font-serif">
+        <div className="bg-muted/50 w-full border border-muted-foreground/20 px-2 md:px-4 py-2 overflow-y-scroll h-full  max-h-[38vh] md:max-h-[55vh] rounded-cmd">
+          <blockquote className="font-serif text-primary/80">
             {getArticleContent()}
           </blockquote>
         </div>
       </div>
 
-      <div className="flex w-full items-center justify-center flex-col lg:flex-row">
+      <div className="flex flex-col items-center justify-center w-full lg:flex-row">
         {/* Inputs section */}
-        <div className="flex flex-col w-full items-center justify-center max-w-lg gap-2 lg:gap-4 lg:pb-4">
-          <div className="w-full flex items-center justify-center flex-col gap-2">
+        <div className="flex flex-col items-center justify-center w-full max-w-lg gap-2 lg:gap-4 lg:pb-4">
+          <div className="flex flex-col items-center justify-center w-full gap-2">
             {/* Human or AI radio group */}
-            <span className="w-full text-muted-foreground text-left text-base">
+            <span className="w-full text-base text-left text-muted-foreground">
               {translations("quizViewQuestionHumanAi")}
             </span>
-            <div className="w-full flex flex-row items-center justify-center gap-2 lg:gap-4">
+            <div className="flex flex-row items-center justify-center w-full gap-2 lg:gap-4">
               {HumanAiButton("human")}
               {HumanAiButton("ai")}
             </div>
           </div>
           {/* Real or fake buttons */}
-          <div className="w-full flex items-center justify-center flex-col gap-2">
-            <span className="w-full text-muted-foreground text-left text-base">
+          <div className="flex flex-col items-center justify-center w-full gap-2">
+            <span className="w-full text-base text-left text-muted-foreground">
               {translations("quizViewQuestionRealFake")}
             </span>
-            <div className="w-full flex flex-row items-center justify-center gap-2 lg:gap-4">
+            <div className="flex flex-row items-center justify-center w-full gap-2 lg:gap-4">
               {RealFakeButton("real")}
               {RealFakeButton("fake")}
             </div>
           </div>
         </div>
         {/* Progress indicator and submit button */}
-        <div className="w-full max-w-lg flex flex-row items-center justify-center gap-4 pt-8 lg:pt-0 pb-2 lg:pb-0">
+        <div className="flex flex-row items-center justify-center w-full max-w-lg gap-4 pt-8 pb-2 lg:pt-0 lg:pb-0">
           {/* Progress indicator */}
           <div className="flex flex-row items-center justify-start gap-2">
             {[...Array(MAX_ARTICLES_PER_SESSION)].map((_, index) => (

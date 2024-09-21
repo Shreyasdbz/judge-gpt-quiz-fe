@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Outfit } from "next/font/google";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "@/i18n/routing";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -15,8 +16,9 @@ const SiteLogoText = ({
   const t = useTranslations("Misc");
 
   return (
-    <div className="w-full flex flex-col items-center justify-center">
-      <div
+    <div className="flex flex-col items-center justify-center w-full">
+      <Link
+        href={"/home"}
         className={cn(
           outfit.className,
           "flex flex-col md:flex-row md:gap-2 leading-tight tracking-tighter lg:text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-black dark:from-white via-red-950 dark:via-red-100 to-green-900 dark:to-green-100",
@@ -26,12 +28,12 @@ const SiteLogoText = ({
         )}
       >
         <span>Judge</span>
-        <span className={cn("", variant === "large" && "-mt-10 md:mt-0")}>
+        <span className={cn("", variant === "large" && "-mt-14 md:mt-0")}>
           GPT
         </span>
-      </div>
+      </Link>
       {!!includeSecondaryText && (
-        <span className="w-full text-left font-light text-muted-foreground text-sm">
+        <span className="w-full text-sm font-light text-left text-muted-foreground">
           {t("siteTextSubtitle")}
         </span>
       )}

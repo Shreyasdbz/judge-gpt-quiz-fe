@@ -1,63 +1,53 @@
 "use client";
 
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { AvatarImage } from "@/models/Profile";
+import Image from "next/image";
+import { AvatarUrls, BASIC_AVATAR_URL } from "@/models/Profile";
+import { useUserSession } from "@/providers/UserSessionProvider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
+  DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil } from "lucide-react";
-import Image from "next/image";
-
-interface AvatarImages extends AvatarImage {
-  url: string;
-}
+import { cn } from "@/lib/utils";
 
 const AvatarUpdateDialog = () => {
-  const [avatarOptions, setAvatarOptions] = useState<AvatarImages[]>([]);
+  const { localProfile } = useUserSession();
+  const [selectedOption, setSelectedOption] =
+    useState<string>(BASIC_AVATAR_URL);
+
+  function onSelectAvatar(url: string) {
+    setSelectedOption(url);
+  }
 
   useEffect(() => {
-    axios
-      .get("/api/profile/avatar", {
-        params: { avatarId: "all" },
-        headers: {
-          //
-        },
-      })
-      .then((res) => {
-        if (res.data && res.data.avatarData) {
-          // Create URLs for the avatar images
-          const avatarImages: AvatarImages[] = res.data.avatarData.map(
-            (avatar: AvatarImage) => ({
-              ...avatar,
-              url: URL.createObjectURL(avatar.data),
-            })
-          );
-          setAvatarOptions(avatarImages);
-        }
-      });
-  }, []);
+    if (localProfile !== null) {
+      setSelectedOption(localProfile.avatarImageUrl || BASIC_AVATAR_URL);
+    }
+  }, [localProfile]);
+
+  if (localProfile === null) {
+    return null;
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="flex items-center justify-center relative rounded-full border-1 overflow-hidden hover:shadow-md">
+        <button className="relative flex items-center justify-center overflow-hidden rounded-full border-1 group">
           <Image
-            src={"/assets/basic-avatar.jpeg"}
+            src={localProfile.avatarImageUrl || BASIC_AVATAR_URL}
             alt="basic-avatar-image"
             width={120}
             height={120}
+            priority={true}
           />
-          <div className="w-full bg-primary-foreground dark:bg-primary-foreground absolute bottom-0 flex items-center justify-center gap-1 px-1 py-2">
-            <Pencil size={10} />
-            <span className="text-sm text-muted-foreground dark:text-muted-foreground">
+          <div className="absolute bottom-0 items-center justify-center hidden w-full gap-1 px-1 py-2 group-hover:flex bg-primary-foreground dark:bg-primary-foreground">
+            <span className="text-sm font-medium text-primary dark:text-primary">
               Edit
             </span>
           </div>
@@ -66,30 +56,43 @@ const AvatarUpdateDialog = () => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="w-full">
           <DialogTitle>
-            <span>Update profile</span>
+            <span>Update avatar</span>
           </DialogTitle>
           <DialogDescription>
-            <span>Update</span>
+            <span>Select an avatar from the options below</span>
           </DialogDescription>
         </DialogHeader>
-        {avatarOptions.length > 0 && (
-          <div className="grid-cols-2 lg-grid-cols-3 w-full h-full">
-            {avatarOptions.map((avatar) => (
+        <div className="w-full h-full grid grid-cols-2 lg:grid-cols-3  max-h-[50vh] overflow-y-scroll">
+          {AvatarUrls.map((avatarUrl) => (
+            <div
+              key={avatarUrl}
+              className="flex items-center justify-center w-full px-2 py-2"
+            >
               <button
-                key={avatar.name}
-                className="flex items-center justify-center relative rounded-full border-1 overflow-hidden hover:shadow-md"
+                className={cn(
+                  "w-fit flex items-center justify-center rounded-full border-4 w-100 h-100 p-0 m-0",
+                  {
+                    "border-primary": selectedOption === avatarUrl,
+                    "border-transparent hover:border-muted-foreground/30":
+                      selectedOption !== avatarUrl,
+                  }
+                )}
+                onClick={() => {
+                  onSelectAvatar(avatarUrl);
+                }}
               >
                 <Image
-                  src={avatar.url}
-                  alt={avatar.name}
-                  width={120}
-                  height={120}
+                  src={avatarUrl}
+                  alt="avatar-image"
+                  width={100}
+                  height={100}
+                  className="rounded-full"
                 />
               </button>
-            ))}
-          </div>
-        )}
-        <DialogFooter className="w-full flex items-center justify-end py-2">
+            </div>
+          ))}
+        </div>
+        <DialogFooter className="flex items-center justify-end w-full py-2">
           <Button type="submit" className="w-full">
             <span>Save</span>
           </Button>

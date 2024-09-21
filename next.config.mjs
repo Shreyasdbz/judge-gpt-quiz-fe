@@ -18,6 +18,17 @@ const nextConfig = {
     MONGO_DB_DATABASE_NAME_DEV: process.env.MONGO_DB_DATABASE_NAME_DEV,
     MONGO_DB_DATABASE_NAME_PROD: process.env.MONGO_DB_DATABASE_NAME_PROD,
   },
+  images: {
+    domains: ["jdugegptstorage1.blob.core.windows.net"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "jdugegptstorage1.blob.core.windows.net",
+        port: "",
+        pathname: "/avatars/**",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

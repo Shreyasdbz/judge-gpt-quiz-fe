@@ -77,7 +77,20 @@ export async function getUserProfileLocalFromDb({
     // Query the database for the user profile
     const result = await ProfileDb.findOne({ uid });
     if (result) {
-      return sanitizeProfileToProfileLocal(result as Profile);
+      const localProfile: ProfileLocal = {
+        uid: result.uid,
+        username: result.username,
+        gender: result.gender,
+        ageGroup: result.age_group,
+        educationLevel: result.education_level,
+        employmentStatus: result.employment_status,
+        politicalAffiliation: result.political_affiliation,
+        locale: result.locale,
+        totalScore: result.total_score,
+        avatarImageUrl: result.avatar_image_url,
+        achievementsUnlocked: result.achievements_unlocked,
+      };
+      return localProfile;
     } else {
       return null;
     }

@@ -30,12 +30,12 @@ const UserStatistics = () => {
     return (
       <Card className="mb-4">
         <CardHeader>
-          <span className="w-full whitespace-nowrap text-xl font-medium">
+          <span className="w-full text-xl font-medium whitespace-nowrap">
             {headerText}
           </span>
         </CardHeader>
         <CardFooter>
-          <span className="w-full whitespace-nowrap text-sm text-muted-foreground">
+          <span className="w-full text-sm whitespace-nowrap text-muted-foreground">
             {captionText}
           </span>
         </CardFooter>
@@ -45,8 +45,8 @@ const UserStatistics = () => {
 
   if (userStatistics === null) {
     return (
-      <div className="w-full flex items-center justify-center flex-col">
-        <span className="w-full text-left text text-muted-foreground font-light">
+      <div className="flex flex-col items-center justify-center w-full">
+        <span className="w-full font-light text-left text text-muted-foreground">
           No statistics to show just yet
         </span>
       </div>
@@ -54,23 +54,31 @@ const UserStatistics = () => {
   }
 
   return (
-    <div className="w-full flex flex-row items-center justify-start gap-4 overflow-y-scroll pr-4">
+    <div className="flex flex-row items-center justify-start w-full gap-4 pr-4 overflow-y-scroll">
       {/* Cast to string */}
       <StatCard
         captionText="Total score"
-        headerText={userStatistics.totalScore.toString()}
+        headerText={userStatistics.totalScore.toFixed(0)}
       />
       <StatCard
-        captionText="# of articles read"
-        headerText={userStatistics.totalQuestionsAnswered.toString()}
+        captionText="Articles read"
+        headerText={userStatistics.totalQuestionsAnswered.toFixed(0)}
       />
       <StatCard
-        captionText="% guessed correctly"
-        headerText={userStatistics.percentCorrect.toString()}
+        captionText="Guessed correctly"
+        headerText={`${userStatistics.percentCorrect.toFixed(2)}%`}
       />
       <StatCard
         captionText="Average time to guess"
-        headerText={`${userStatistics.averageTimeToRespond.toString()}s`}
+        headerText={`${userStatistics.averageTimeToRespond.toFixed(2)}s`}
+      />
+      <StatCard
+        captionText="Responded human authored"
+        headerText={`${userStatistics.percentRespondedIsHuman.toFixed(2)}%`}
+      />
+      <StatCard
+        captionText="Responded is fake"
+        headerText={`${userStatistics.percentRespondedIsFake.toFixed(2)}%`}
       />
     </div>
   );

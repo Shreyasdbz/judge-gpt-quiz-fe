@@ -2,8 +2,28 @@ import { z } from "zod";
 
 export const LOCAL_STORAGE_KEY_PROFILE = "judgegpt_app_profile_uid";
 
-export const BASIC_AVATAR_URL =
-  "https://jdugegptstorage1.blob.core.windows.net/avatars/basic-avatar.jpeg";
+export const AvatarUrls = [
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/basic-avatar-3.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/basic-avatar-2.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/basic-avatar.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/0DEBF493-634D-41F0-A487-3DBAD032BE6D.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/312FAE66-5813-4076-A014-D1E62F4C41C1.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/3496B3C9-A791-41F3-A1BF-EF1D95D17CE8.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/5060D8EF-3F29-40B0-AA16-BE5853386C76.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/5F586AD1-588B-44FA-A83B-4E6E14C22F45.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/727D722A-D1FC-4C0E-8260-4235632A0148.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/915A0AF5-59CA-4BE0-A695-A05441BB7C56.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/9EC1C28D-A8E2-45E7-9A6C-C8D55B8B32F0.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/B0E9554F-1620-4295-B081-912BAD89DFDE.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/D0B8FA55-7D92-436B-B3BA-D7A39FF289AC.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/D87617AF-B6A6-4C06-BFF2-A4FBBBA95647.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/DC6893C0-8241-46A5-8395-FD6B2CD4577A.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/EB3C03F6-3DF1-4467-BD4E-9081CDE4E467.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/FB093E3D-BDBF-4CFD-80CD-16B728AB45B2.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/FF29FAC5-8283-4CBE-889C-F7D89D0B87F0.jpeg",
+  "https://jdugegptstorage1.blob.core.windows.net/avatars/FF7B5EE5-32D8-4DD8-A439-5CC9901FE3AF.jpeg",
+];
+export const BASIC_AVATAR_URL = AvatarUrls[0];
 
 export enum GenderOptions {
   Male = "Male",
@@ -127,6 +147,8 @@ export interface Profile {
  * - employmentStatus
  * - politicalAffiliation
  * - totalScore
+ * - avatarImageUrl
+ * - achievementsUnlocked
  */
 export interface ProfileLocal
   extends Omit<
@@ -190,4 +212,5 @@ export const ProfileFormSchema = z.object({
     .refine((value) => value === true, {
       message: "Please consent to data collection to continue",
     }),
+  avatarImageUrl: z.string().optional(),
 });

@@ -40,6 +40,7 @@ async function GET(req: NextRequest) {
 
     // Fetch the user profile from the server
     const profile = await getUserProfileLocalFromDb({ uid });
+    console.log(profile);
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
